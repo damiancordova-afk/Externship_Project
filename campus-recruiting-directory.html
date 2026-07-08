@@ -104,14 +104,13 @@
     .wordmark__mark {
       width: 28px;
       height: 28px;
-      border-radius: 50%;
-      background: var(--ink);
-      color: var(--white);
       display: grid;
       place-items: center;
-      font-size: 15px;
-      font-weight: 400;
-      letter-spacing: -0.5px;
+    }
+    .wordmark__mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     .wordmark__name {
       font-size: 18px;
@@ -302,11 +301,21 @@
       text-overflow: ellipsis;
     }
     .row__hires {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
       font-size: 14px;
       color: var(--text-secondary);
       text-align: right;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
+    }
+    .row__hires-count { color: var(--ink); }
+    .row__fair {
+      font-size: 12px;
+      color: var(--text-label);
+      letter-spacing: -0.1px;
     }
     .row__chevron {
       color: var(--text-secondary);
@@ -327,17 +336,16 @@
       flex-shrink: 0;
     }
     .tier--1 {
-      background: rgba(235, 176, 60, 0.18);
-      color: var(--gold-600);
+      background: rgba(34, 139, 76, 0.16);
+      color: #1B7A44;
     }
     .tier--2 {
-      background: var(--n-200);
-      color: var(--n-700);
+      background: rgba(235, 176, 60, 0.20);
+      color: var(--gold-600);
     }
     .tier--3 {
-      background: var(--n-100);
-      color: var(--text-body);
-      border: 1px solid var(--border-soft);
+      background: rgba(196, 52, 45, 0.14);
+      color: #B0332C;
     }
 
     .empty {
@@ -465,7 +473,7 @@
       }
       .row:last-child { border-bottom: 1px solid var(--border-soft); margin-bottom: 0; }
       .row__name-wrap { flex-wrap: wrap; }
-      .row__hires { text-align: left; }
+      .row__hires { text-align: left; align-items: flex-start; }
       .row__chevron { display: none; }
     }
 
@@ -484,7 +492,18 @@
     <header class="header">
       <div class="header__left">
         <div class="wordmark">
-          <span class="wordmark__mark" aria-hidden="true">V</span>
+          <span class="wordmark__mark" aria-hidden="true">
+            <svg viewBox="335 2 65 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M370.01 22.5377L378.288 2.55489H370.349L367.228 12.699L364.106 2.55489H356.168L364.446 22.5377H370.01Z" fill="#E19614"/>
+              <path d="M364.446 45.1552L356.168 65.1381H364.106L367.228 54.994L370.349 65.1381H378.288L370.01 45.1552H364.446Z" fill="#E19614"/>
+              <path d="M355.919 31.0645L335.936 22.7864V30.7252L346.08 33.8465L335.936 36.9677V44.9067L355.919 36.6285V31.0645Z" fill="#E19614"/>
+              <path d="M398.519 22.7864L378.536 31.0645V36.6285L398.519 44.9067V36.9677L388.375 33.8465L398.519 30.7252V22.7864Z" fill="#E19614"/>
+              <path d="M357.276 39.8741L337.282 48.1636L342.891 53.7728L352.277 48.7971L347.301 58.1832L352.911 63.7924L361.2 43.7984L357.276 39.8741Z" fill="#E19614"/>
+              <path d="M377.18 27.8189L397.174 19.5295L391.564 13.9202L382.178 18.8961L387.154 9.50978L381.545 3.90057L373.255 23.8947L377.18 27.8189Z" fill="#E19614"/>
+              <path d="M373.255 43.7984L381.545 63.7924L387.154 58.1832L382.178 48.7971L391.564 53.7728L397.174 48.1636L377.18 39.8741L373.255 43.7984Z" fill="#E19614"/>
+              <path d="M361.2 23.8947L352.911 3.90057L347.301 9.50978L352.277 18.8961L342.891 13.9202L337.282 19.5295L357.276 27.8189L361.2 23.8947Z" fill="#E19614"/>
+            </svg>
+          </span>
           <span class="wordmark__name">Valon</span>
         </div>
         <span class="header__divider" aria-hidden="true"></span>
@@ -531,6 +550,12 @@
         <button class="pill" type="button" data-tier="2" aria-pressed="false">Tier 2</button>
         <button class="pill" type="button" data-tier="3" aria-pressed="false">Tier 3</button>
       </div>
+      <div class="filters" role="group" aria-label="Sort schools">
+        <span class="filters__label">Sort</span>
+        <button class="pill" type="button" data-sort="hires" aria-pressed="true">Most hires</button>
+        <button class="pill" type="button" data-sort="recentFair" aria-pressed="false">Most recent career fair</button>
+        <button class="pill" type="button" data-sort="upcomingFair" aria-pressed="false">Upcoming career fair</button>
+      </div>
     </div>
 
     <p class="result-count" id="resultCount" aria-live="polite"></p>
@@ -557,6 +582,8 @@
             <span id="modalTier"></span>
             <span aria-hidden="true">·</span>
             <span id="modalHires"></span>
+            <span aria-hidden="true">·</span>
+            <span id="modalFair"></span>
           </div>
         </div>
         <button class="icon-btn" type="button" id="modalClose" aria-label="Close detail">
@@ -610,21 +637,21 @@
     // Mock data
     // ------------------------------------------------------------
     const SCHOOLS = [
-      { id: "SCH-001", name: "Stanford University", tier: 1, hires: 24 },
-      { id: "SCH-002", name: "Massachusetts Institute of Technology", tier: 1, hires: 21 },
-      { id: "SCH-003", name: "University of California, Berkeley", tier: 1, hires: 19 },
-      { id: "SCH-004", name: "Carnegie Mellon University", tier: 1, hires: 16 },
-      { id: "SCH-005", name: "University of Michigan", tier: 2, hires: 14 },
-      { id: "SCH-006", name: "Georgia Institute of Technology", tier: 2, hires: 12 },
-      { id: "SCH-007", name: "University of Texas at Austin", tier: 2, hires: 11 },
-      { id: "SCH-008", name: "University of Illinois Urbana-Champaign", tier: 2, hires: 9 },
-      { id: "SCH-009", name: "Purdue University", tier: 2, hires: 8 },
-      { id: "SCH-010", name: "Cornell University", tier: 1, hires: 15 },
-      { id: "SCH-011", name: "Arizona State University", tier: 3, hires: 6 },
-      { id: "SCH-012", name: "San José State University", tier: 3, hires: 5 },
-      { id: "SCH-013", name: "University of Washington", tier: 2, hires: 10 },
-      { id: "SCH-014", name: "Rutgers University", tier: 3, hires: 4 },
-      { id: "SCH-015", name: "Northeastern University", tier: 3, hires: 7 },
+      { id: "SCH-001", name: "Stanford University", tier: 1, hires: 24, lastFair: "2026-04-15", nextFair: "2026-09-22" },
+      { id: "SCH-002", name: "Massachusetts Institute of Technology", tier: 1, hires: 21, lastFair: "2026-03-28", nextFair: "2026-09-15" },
+      { id: "SCH-003", name: "University of California, Berkeley", tier: 1, hires: 19, lastFair: "2026-05-02", nextFair: "2026-10-01" },
+      { id: "SCH-004", name: "Carnegie Mellon University", tier: 1, hires: 16, lastFair: "2026-02-10", nextFair: "2026-08-28" },
+      { id: "SCH-005", name: "University of Michigan", tier: 2, hires: 14, lastFair: "2025-10-18", nextFair: "2026-10-14" },
+      { id: "SCH-006", name: "Georgia Institute of Technology", tier: 2, hires: 12, lastFair: "2026-01-22", nextFair: "2026-09-08" },
+      { id: "SCH-007", name: "University of Texas at Austin", tier: 2, hires: 11, lastFair: "2025-11-05", nextFair: "2026-11-03" },
+      { id: "SCH-008", name: "University of Illinois Urbana-Champaign", tier: 2, hires: 9, lastFair: "2025-09-30", nextFair: "2026-09-29" },
+      { id: "SCH-009", name: "Purdue University", tier: 2, hires: 8, lastFair: "2026-06-12", nextFair: "2026-08-19" },
+      { id: "SCH-010", name: "Cornell University", tier: 1, hires: 15, lastFair: "2026-04-01", nextFair: "2026-09-17" },
+      { id: "SCH-011", name: "Arizona State University", tier: 3, hires: 6, lastFair: "2025-08-14", nextFair: "2026-08-11" },
+      { id: "SCH-012", name: "San José State University", tier: 3, hires: 5, lastFair: "2026-05-20", nextFair: "2026-10-06" },
+      { id: "SCH-013", name: "University of Washington", tier: 2, hires: 10, lastFair: "2026-03-11", nextFair: "2026-09-24" },
+      { id: "SCH-014", name: "Rutgers University", tier: 3, hires: 4, lastFair: "2025-07-25", nextFair: "2026-11-12" },
+      { id: "SCH-015", name: "Northeastern University", tier: 3, hires: 7, lastFair: "2026-06-28", nextFair: "2026-07-30" },
     ];
 
     const TIER_LABEL = { 1: "Tier 1", 2: "Tier 2", 3: "Tier 3" };
@@ -633,19 +660,49 @@
     // State
     // ------------------------------------------------------------
     let query = "";
+    let sortBy = "hires"; // "hires" | "recentFair" | "upcomingFair"
+
+    // Today as an ISO string (YYYY-MM-DD) for comparing fair dates
+    const TODAY_ISO = new Date().toLocaleDateString("en-CA");
     const activeTiers = new Set();
 
     const rowsEl = document.getElementById("rows");
     const emptyEl = document.getElementById("empty");
     const countEl = document.getElementById("resultCount");
 
+    const fairFmt = new Intl.DateTimeFormat("en-US", {
+      month: "short", day: "numeric", year: "numeric",
+    });
+    function formatFair(iso) {
+      // Parse as local date to avoid timezone shifting the day
+      const [y, m, d] = iso.split("-").map(Number);
+      return fairFmt.format(new Date(y, m - 1, d));
+    }
+
     function filtered() {
       const q = query.trim().toLowerCase();
-      return SCHOOLS.filter(s => {
+      const list = SCHOOLS.filter(s => {
         const matchQ = !q || s.name.toLowerCase().includes(q);
         const matchT = activeTiers.size === 0 || activeTiers.has(s.tier);
         return matchQ && matchT;
       });
+
+      list.sort((a, b) => {
+        if (sortBy === "recentFair") {
+          // Most recent (past) career fair first
+          return b.lastFair.localeCompare(a.lastFair);
+        }
+        if (sortBy === "upcomingFair") {
+          // Soonest upcoming fair first; fairs already past sink to the bottom
+          const aUp = a.nextFair >= TODAY_ISO;
+          const bUp = b.nextFair >= TODAY_ISO;
+          if (aUp !== bUp) return aUp ? -1 : 1;
+          return a.nextFair.localeCompare(b.nextFair);
+        }
+        return b.hires - a.hires; // most hires first
+      });
+
+      return list;
     }
 
     function chevron() {
@@ -663,13 +720,20 @@
         btn.type = "button";
         btn.className = "row";
         btn.setAttribute("role", "row");
-        btn.setAttribute("aria-label", `${s.name}, ${TIER_LABEL[s.tier]}, ${s.hires} hires`);
+        const showUpcoming = sortBy === "upcomingFair";
+        const fairLabel = showUpcoming ? "Next fair" : "Last fair";
+        const fairDate = formatFair(showUpcoming ? s.nextFair : s.lastFair);
+        btn.setAttribute("aria-label",
+          `${s.name}, ${TIER_LABEL[s.tier]}, ${s.hires} hires, ${fairLabel.toLowerCase()} ${fairDate}`);
         btn.innerHTML = `
           <span class="row__name-wrap">
             <span class="row__name">${s.name}</span>
             <span class="tier tier--${s.tier}">${TIER_LABEL[s.tier]}</span>
           </span>
-          <span class="row__hires">${s.hires} hire${s.hires === 1 ? "" : "s"}</span>
+          <span class="row__hires">
+            <span class="row__hires-count">${s.hires} hire${s.hires === 1 ? "" : "s"}</span>
+            <span class="row__fair">${fairLabel} · ${fairDate}</span>
+          </span>
           ${chevron()}
         `;
         btn.addEventListener("click", () => openDetail(s));
@@ -695,6 +759,8 @@
       document.getElementById("modalTier").textContent = TIER_LABEL[s.tier];
       document.getElementById("modalHires").textContent =
         `${s.hires} hire${s.hires === 1 ? "" : "s"}`;
+      document.getElementById("modalFair").textContent =
+        `Next fair ${formatFair(s.nextFair)}`;
       document.getElementById("modalId").textContent = s.id;
       overlay.classList.add("open");
       document.getElementById("modalClose").focus();
@@ -740,12 +806,23 @@
       render();
     });
 
-    document.querySelectorAll(".pill").forEach(pill => {
+    document.querySelectorAll(".pill[data-tier]").forEach(pill => {
       pill.addEventListener("click", () => {
         const tier = Number(pill.dataset.tier);
         const on = pill.getAttribute("aria-pressed") === "true";
         pill.setAttribute("aria-pressed", String(!on));
         if (on) activeTiers.delete(tier); else activeTiers.add(tier);
+        render();
+      });
+    });
+
+    // Sort pills — single-select (radio-like)
+    const sortPills = document.querySelectorAll(".pill[data-sort]");
+    sortPills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        sortBy = pill.dataset.sort;
+        sortPills.forEach(p =>
+          p.setAttribute("aria-pressed", String(p === pill)));
         render();
       });
     });
