@@ -519,6 +519,14 @@
       </div>
       <div class="filters" role="group" aria-label="Filter by tier">
         <span class="filters__label">Tier</span>
+        <button class="icon-btn" type="button" id="tierInfoBtn" aria-label="Tier information" title="Tier information">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 8v.01" />
+            <path d="M11 12h1v4" />
+          </svg>
+        </button>
         <button class="pill" type="button" data-tier="1" aria-pressed="false">Tier 1</button>
         <button class="pill" type="button" data-tier="2" aria-pressed="false">Tier 2</button>
         <button class="pill" type="button" data-tier="3" aria-pressed="false">Tier 3</button>
@@ -565,6 +573,34 @@
       <div class="modal__actions">
         <button class="btn btn--secondary" type="button" id="modalCloseBtn">Close</button>
         <button class="btn btn--primary" type="button">View full profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier info modal -->
+  <div class="overlay" id="tierInfoOverlay" role="dialog" aria-modal="true" aria-labelledby="tierInfoTitle">
+    <div class="modal">
+      <div class="modal__top">
+        <div>
+          <h2 class="modal__title" id="tierInfoTitle">Tier definitions</h2>
+          <div class="modal__meta" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:6px;">
+            <div><strong>Tier 1:</strong> Top-priority schools — highest historical hires and strategic partnerships.</div>
+            <div><strong>Tier 2:</strong> Important regional/state flagships — steady sources of hires.</div>
+            <div><strong>Tier 3:</strong> Emerging/opportunistic schools — fewer hires, opportunistic engagement.</div>
+          </div>
+        </div>
+        <button class="icon-btn" type="button" id="tierInfoClose" aria-label="Close tier info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal__placeholder" style="text-align:left;">
+        Use these definitions to guide prioritization and recruiting strategy.
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--secondary" type="button" id="tierInfoCloseBtn">Close</button>
       </div>
     </div>
   </div>
@@ -673,8 +709,28 @@
     document.getElementById("modalCloseBtn").addEventListener("click", closeDetail);
     overlay.addEventListener("click", e => { if (e.target === overlay) closeDetail(); });
     document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && overlay.classList.contains("open")) closeDetail();
+      if (e.key === "Escape") {
+        if (overlay.classList.contains("open")) closeDetail();
+        if (typeof tierInfoOverlay !== 'undefined' && tierInfoOverlay.classList.contains("open")) closeTierInfo();
+      }
     });
+
+    // Tier info modal handlers
+    const tierInfoOverlay = document.getElementById("tierInfoOverlay");
+    document.getElementById("tierInfoBtn").addEventListener("click", () => {
+      lastFocused = document.activeElement;
+      tierInfoOverlay.classList.add("open");
+      document.getElementById("tierInfoClose").focus();
+    });
+
+    function closeTierInfo() {
+      tierInfoOverlay.classList.remove("open");
+      if (lastFocused) lastFocused.focus();
+    }
+
+    document.getElementById("tierInfoClose").addEventListener("click", closeTierInfo);
+    document.getElementById("tierInfoCloseBtn").addEventListener("click", closeTierInfo);
+    tierInfoOverlay.addEventListener("click", e => { if (e.target === tierInfoOverlay) closeTierInfo(); });
 
     // ------------------------------------------------------------
     // Controls
