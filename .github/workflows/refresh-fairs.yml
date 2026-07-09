@@ -1,0 +1,46 @@
+name: Refresh career fairs
+
+# Scrapes college career-center pages and commits any newly-found fairs into
+# career_fairs.json (and the embedded fallback in the HTML).
+#
+# Runs weekly and can be triggered manually from the Actions tab.
+
+on:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 13:00 UTC (~6am PT)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-fairs
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Scrape and merge new fairs
+        run: python scripts/scrape_fairs.py
+
+      - name: Commit changes if any
+        run: |
+          if [[ -n "$(git status --porcelain campus-recruiting-directory.html career_fairs.json)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add career_fairs.json campus-recruiting-directory.html
+            git commit -m "chore: refresh career-fair dates (automated scrape)"
+            git push
+          else
+            echo "No changes to commit."
+          fi

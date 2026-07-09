@@ -32,16 +32,16 @@
     { "college": "Georgia Tech", "name": "College of Computing (CoC) Career Fair", "date": "2026-09-17", "location": "McCamish Pavilion", "source": "https://careerfair.gatech.edu/upcoming-career-fairs/" },
     { "college": "Georgia Tech", "name": "ECE Career Fair", "date": "2026-09-18", "location": "McCamish Pavilion", "source": "https://ece.gatech.edu/careerfair" },
 
-    { "college": "Cornell", "name": "Cornell Career Fair Days - All Industries", "date": "2026-03-09", "location": "Barton Hall, Ithaca, NY", "source": "https://career.cornell.edu/resources/career-fairs/" },
-    { "college": "Cornell", "name": "Cornell Career Fair Days - Real Estate & Hospitality", "date": "2026-03-10", "location": "Barton Hall, Ithaca, NY", "source": "https://career.cornell.edu/resources/career-fairs/" },
+    { "college": "Cornell", "name": "Cornell Career Fair Days - All Industries", "date": "2026-03-09", "location": "Barton Hall, Ithaca, NY", "source": "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days/" },
+    { "college": "Cornell", "name": "Cornell Career Fair Days - Real Estate & Hospitality", "date": "2026-03-10", "location": "Barton Hall, Ithaca, NY", "source": "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days/" },
     { "college": "Cornell", "name": "AAP (Architecture/Art/Planning) Spring Career Fair", "date": "2026-03-07", "location": "Milstein Hall Dome", "source": "https://aap.cornell.edu/events/function/career-fair-days-spring-2026/" },
 
     { "college": "San Jose State", "name": "Fall Part-Time & On-Campus Job Fair", "date": "2026-08-19", "location": "Student Union Ballroom", "source": "https://careercenter.sjsu.edu/events/" },
     { "college": "San Jose State", "name": "Fall STEM Undergrad Job/Internship Fair (Day 1)", "date": "2026-09-09", "location": "Student Union Ballroom", "source": "https://careercenter.sjsu.edu/events/" },
     { "college": "San Jose State", "name": "Late Spring Job & Internship Fair", "date": "2026-04-14", "location": "Student Union Ballroom", "source": "https://careercenter.sjsu.edu/events/" },
 
-    { "college": "Northeastern", "name": "Spring Talent Connect Career Fair", "date": "2026-02-11", "location": "Boston, MA", "source": "https://careers.northeastern.edu/group/career-fairs/" },
-    { "college": "Northeastern", "name": "Talent Connect (Business/CS day)", "date": "2026-02-12", "location": "Boston, MA", "source": "https://careers.northeastern.edu/group/career-fairs/" },
+    { "college": "Northeastern", "name": "Spring Talent Connect Career Fair", "date": "2026-02-11", "location": "Boston, MA", "source": "https://careers.northeastern.edu/events/" },
+    { "college": "Northeastern", "name": "Talent Connect (Business/CS day)", "date": "2026-02-12", "location": "Boston, MA", "source": "https://careers.northeastern.edu/events/" },
 
     { "college": "Carnegie Mellon", "name": "STEM Career Fair (In-Person)", "date": "2026-09-15", "location": "Weigand Gym / University Center", "source": "https://www.cmu.edu/career/employers/stem-in-person.html" },
     { "college": "Carnegie Mellon", "name": "STEAM Job & Internship Career Fair", "date": "2026-02-12", "location": "Weigand Gym", "source": "https://the-tartan.org/2026/02/16/cmu-hosts-annual-steam-career-fair/" },

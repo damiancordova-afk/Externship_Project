@@ -15,25 +15,51 @@ a school has no future fair left in the data, the row shows
 "No upcoming fair listed" and sinks to the bottom of the "Upcoming career fair"
 sort.
 
-## 2. New fairs being posted — needs a refresh job
+## 2. New fairs being posted — the scheduled scraper (BUILT)
 
 The app reads its data from **`career_fairs.json`** (with an identical copy
 embedded in the HTML as a `file://` fallback). To pick up newly-posted fairs, a
-scheduled job must rewrite `career_fairs.json`. The browser cannot scrape the
-college career-center pages itself — cross-origin requests to those sites are
-blocked, and they serve HTML, not an API.
+scheduled job rewrites `career_fairs.json`. The browser cannot scrape the college
+career-center pages itself — cross-origin requests to those sites are blocked, and
+they serve HTML, not an API — so this runs server-side.
 
-### Options for the refresh job (pick one)
+### What's implemented
 
-- **Scrape the source pages.** Each fair row carries a `source` URL (the public
-  career-center page it came from). A scheduled scraper (GitHub Action / cron)
-  fetches those pages, parses the dates, and writes `career_fairs.json`. Most
-  robust but per-site parsing is brittle — the schools redesign pages.
-- **Handshake / ATS API.** If Valon has Handshake employer API access (or pulls
-  fair schedules from another system), query it on a schedule and emit the same
-  JSON shape. Cleaner than scraping.
-- **Manual/CSV.** A recruiter edits a sheet; an export step writes the JSON.
-  Lowest engineering cost, human-in-the-loop.
+- **`scripts/scrape_fairs.py`** — fetches each college's known `source` pages,
+  extracts fair dates, and MERGES new ones into `career_fairs.json` (additive —
+  never deletes curated history; dedupes by college+date; tags auto rows with
+  `"auto": true`). It also regenerates the `FAIRS_FALLBACK` block in the HTML
+  between the `FAIRS_FALLBACK_START/END` markers. Run it with `--dry-run` to
+  preview, `--no-net` to exercise only the merge/write path.
+- **`.github/workflows/refresh-fairs.yml`** — runs the scraper weekly (Mon 13:00
+  UTC) and on manual dispatch, then commits any changes.
+
+### Honest limits (read before trusting it)
+
+- **Works on static-HTML pages only.** A live test captured
+  Purdue/UIUC/Georgia Tech/Rutgers/SJSU/Cornell well.
+- **Five schools can't be scraped** and must be entered manually (see below).
+- **Name quality varies.** The generic extractor grabs imperfect fair names.
+  Add a site-specific function to the `EXTRACTORS` registry to fix a given site.
+- **Parsers break on redesigns.** Review the automated commits the Action pushes;
+  auto rows are tagged `"auto": true` so they're easy to spot and prune.
+
+### The five holdouts — why, and what to do
+
+Investigated live. A headless browser (Playwright) was tried and **removed**: it
+rendered the pages but the specific dates still weren't present, because they
+live in login-gated platforms. Valon does **not** have API access to those, so
+these are **manual-entry** schools. The scraper lists them in `MANUAL_COLLEGES`
+and skips them entirely, so it never overwrites or duplicates your hand-entered
+rows. To maintain them, add/update curated (non-`auto`) rows in
+`career_fairs.json` once per recruiting season:
+
+- **UC Berkeley, Arizona State, Northeastern** — dates live inside
+  Handshake / 12twenty (behind school login); the public pages only show fair
+  names, not dates.
+- **Michigan** — the career-center site is behind a WAF that returns 403 to
+  automated requests (including headless Chromium).
+- (**Cornell** is now scraped — its `source` was updated to a working event URL.)
 
 ### JSON shape the app expects
 

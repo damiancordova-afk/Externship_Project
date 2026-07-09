@@ -758,6 +758,7 @@
     // it — see scripts/refresh_fairs.md). We fetch it on load. The array
     // below is an identical FALLBACK so the page still works when opened
     // directly from disk (file://), where fetch() is blocked by the browser.
+    /* FAIRS_FALLBACK_START */
     const FAIRS_FALLBACK = [
       { college: "Stanford", name: "Spring On-Campus Career Fair", date: "2026-04-21", location: "McCaw Hall, Stanford Alumni Center", source: "https://careered.stanford.edu/events" },
       { college: "Stanford", name: "Winter Career Fair", date: "2026-01-22", location: "Li Ka Shing Center, Berg Hall", source: "https://forum.stanford.edu/events/career-fair" },
@@ -782,14 +783,14 @@
       { college: "Georgia Tech", name: "All-Majors Career Fair (Fall)", date: "2026-09-14", location: "Campus Recreation Center (CRC)", source: "https://careerfair.gatech.edu/upcoming-career-fairs/" },
       { college: "Georgia Tech", name: "College of Computing (CoC) Career Fair", date: "2026-09-17", location: "McCamish Pavilion", source: "https://careerfair.gatech.edu/upcoming-career-fairs/" },
       { college: "Georgia Tech", name: "ECE Career Fair", date: "2026-09-18", location: "McCamish Pavilion", source: "https://ece.gatech.edu/careerfair" },
-      { college: "Cornell", name: "Cornell Career Fair Days - All Industries", date: "2026-03-09", location: "Barton Hall, Ithaca, NY", source: "https://career.cornell.edu/resources/career-fairs/" },
-      { college: "Cornell", name: "Cornell Career Fair Days - Real Estate & Hospitality", date: "2026-03-10", location: "Barton Hall, Ithaca, NY", source: "https://career.cornell.edu/resources/career-fairs/" },
+      { college: "Cornell", name: "Cornell Career Fair Days - All Industries", date: "2026-03-09", location: "Barton Hall, Ithaca, NY", source: "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days/" },
+      { college: "Cornell", name: "Cornell Career Fair Days - Real Estate & Hospitality", date: "2026-03-10", location: "Barton Hall, Ithaca, NY", source: "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days/" },
       { college: "Cornell", name: "AAP (Architecture/Art/Planning) Spring Career Fair", date: "2026-03-07", location: "Milstein Hall Dome", source: "https://aap.cornell.edu/events/function/career-fair-days-spring-2026/" },
       { college: "San Jose State", name: "Fall Part-Time & On-Campus Job Fair", date: "2026-08-19", location: "Student Union Ballroom", source: "https://careercenter.sjsu.edu/events/" },
       { college: "San Jose State", name: "Fall STEM Undergrad Job/Internship Fair (Day 1)", date: "2026-09-09", location: "Student Union Ballroom", source: "https://careercenter.sjsu.edu/events/" },
       { college: "San Jose State", name: "Late Spring Job & Internship Fair", date: "2026-04-14", location: "Student Union Ballroom", source: "https://careercenter.sjsu.edu/events/" },
-      { college: "Northeastern", name: "Spring Talent Connect Career Fair", date: "2026-02-11", location: "Boston, MA", source: "https://careers.northeastern.edu/group/career-fairs/" },
-      { college: "Northeastern", name: "Talent Connect (Business/CS day)", date: "2026-02-12", location: "Boston, MA", source: "https://careers.northeastern.edu/group/career-fairs/" },
+      { college: "Northeastern", name: "Spring Talent Connect Career Fair", date: "2026-02-11", location: "Boston, MA", source: "https://careers.northeastern.edu/events/" },
+      { college: "Northeastern", name: "Talent Connect (Business/CS day)", date: "2026-02-12", location: "Boston, MA", source: "https://careers.northeastern.edu/events/" },
       { college: "Carnegie Mellon", name: "STEM Career Fair (In-Person)", date: "2026-09-15", location: "Weigand Gym / University Center", source: "https://www.cmu.edu/career/employers/stem-in-person.html" },
       { college: "Carnegie Mellon", name: "STEAM Job & Internship Career Fair", date: "2026-02-12", location: "Weigand Gym", source: "https://the-tartan.org/2026/02/16/cmu-hosts-annual-steam-career-fair/" },
       { college: "Rutgers", name: "Fall Career & Internship Mega Fair (Day 1)", date: "2026-09-15", location: "Jersey Mike's Arena, Piscataway", source: "https://careers.rutgers.edu/events/career-internship-fairs" },
@@ -802,6 +803,7 @@
       { college: "UIUC", name: "Gies College of Business Fall Career Fair", date: "2026-09-15", location: "1900 South First Street, Champaign", source: "https://www.careercenter.illinois.edu/career-events" },
       { college: "UIUC", name: "CEE Fall Job Fair", date: "2026-09-15", location: "Illini Union", source: "https://cee.illinois.edu/student-life/career-prep/job-fair-cee-students" },
     ];
+    /* FAIRS_FALLBACK_END */
 
     // Populated at load: fairKey -> fairs sorted ascending by date
     let FAIRS_BY_COLLEGE = new Map();
