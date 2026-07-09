@@ -1,7 +1,9 @@
 name: Refresh career fairs
 
-# Scrapes college career-center pages and commits any newly-found fairs into
-# career_fairs.json (and the embedded fallback in the HTML).
+# Scrapes each college's career-center page and commits any newly-found upcoming
+# fairs into career_fairs.json (the single source of truth). The directory page
+# is regenerated from that JSON by build_directory.py and is never committed
+# (it contains candidate PII), so this job only touches career_fairs.json.
 #
 # Runs weekly and can be triggered manually from the Actions tab.
 
@@ -35,10 +37,10 @@ jobs:
 
       - name: Commit changes if any
         run: |
-          if [[ -n "$(git status --porcelain campus-recruiting-directory.html career_fairs.json)" ]]; then
+          if [[ -n "$(git status --porcelain career_fairs.json)" ]]; then
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add career_fairs.json campus-recruiting-directory.html
+            git add career_fairs.json
             git commit -m "chore: refresh career-fair dates (automated scrape)"
             git push
           else

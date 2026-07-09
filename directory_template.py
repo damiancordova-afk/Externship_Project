@@ -113,6 +113,32 @@ TEMPLATE = r"""<!DOCTYPE html>
     .tag--ny::before { background:var(--n-500); }
     .tag--sf::before { background:var(--ink); }
     .tag--hired::before { background:#3F7D5B; }
+    .tag--fair::before { background:#2F6FB0; }
+    .tag--extra::before { background:var(--n-400); }
+
+    /* Row: stack name + next-fair line in the first column */
+    .row__main { display:flex; flex-direction:column; gap:6px; min-width:0; }
+    .row__sub { display:inline-flex; align-items:center; gap:6px; font-size:13px;
+      color:var(--text-secondary); }
+    .row__sub svg { width:14px; height:14px; flex-shrink:0; color:#2F6FB0; }
+    .row__sub b { font-weight:400; color:var(--text-body); font-variant-numeric:tabular-nums; }
+    .row__sub .row__sub-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* Modal: upcoming career-fair block */
+    .fairs { margin:8px 0 24px; }
+    .fairs__title { font-size:12px; text-transform:uppercase; letter-spacing:0.6px;
+      color:var(--text-label); margin:0 0 12px; }
+    .fair { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--divider); }
+    .fair:last-child { border-bottom:none; }
+    .fair__date { flex-shrink:0; width:64px; text-align:center; line-height:1.1; }
+    .fair__date-m { font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:#2F6FB0; }
+    .fair__date-d { font-size:22px; font-variant-numeric:tabular-nums; }
+    .fair__date-y { font-size:11px; color:var(--text-label); }
+    .fair__body { min-width:0; }
+    .fair__name { font-size:15px; margin-bottom:2px; }
+    .fair__loc { font-size:13px; color:var(--text-secondary); }
+    .fair__src { font-size:13px; }
+    .fair__src a { color:#2F6FB0; }
 
     .empty { padding:64px 24px; text-align:center; color:var(--text-secondary); font-size:15px; }
 
@@ -196,7 +222,8 @@ TEMPLATE = r"""<!DOCTYPE html>
       <h1>Campus Recruiting Directory</h1>
       <p>Schools Valon can source campus talent from — every college we've hired
          from, plus top national universities and New York State institutions.
-         Click a school to see who we hired there and how to reach them.</p>
+         Click a school to see who we hired there, how to reach them, and its
+         upcoming general & tech/STEM career fairs.</p>
     </section>
 
     <div class="controls">
@@ -210,6 +237,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       </div>
       <div class="filters" role="group" aria-label="Filter schools">
         <span class="filters__label">Show</span>
+        <button class="pill" type="button" data-filter="fair" aria-pressed="false">Upcoming career fair</button>
         <button class="pill" type="button" data-filter="hired" aria-pressed="false">Has hires</button>
         <button class="pill" type="button" data-filter="ranked" aria-pressed="false">Top 100</button>
         <button class="pill" type="button" data-filter="ny" aria-pressed="false">New York</button>
@@ -253,7 +281,21 @@ TEMPLATE = r"""<!DOCTYPE html>
   <script>
     const DATA = __DATA__;
     const SCHOOLS = DATA.schools;
-    const CRIT = { ranked:"Top 100", ny:"New York", sf:"San Francisco", hired:"Has hires" };
+    const CRIT = { ranked:"Top 100", ny:"New York", sf:"San Francisco",
+                   hired:"Has hires", fair:"Career fair", extra:"Also tracked" };
+
+    // Recompute "upcoming" against today's date on every load, so a fair that
+    // has passed drops off without needing the page to be rebuilt.
+    const TODAY_ISO = new Date().toISOString().slice(0, 10);
+    function upcomingFairs(s) {
+      return (s.fairs || []).filter(f => f.date >= TODAY_ISO)
+                            .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+    }
+    function fmtDate(iso) {
+      const [y, m, d] = iso.split("-").map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString("en-US",
+        { month: "short", day: "numeric", year: "numeric" });
+    }
 
     const rowsEl = document.getElementById("rows");
     const emptyEl = document.getElementById("empty");
@@ -265,7 +307,11 @@ TEMPLATE = r"""<!DOCTYPE html>
     function matches(s) {
       const q = query.trim().toLowerCase();
       if (q && !s.name.toLowerCase().includes(q)) return false;
-      for (const f of active) if (!s.criteria.includes(f)) return false;
+      for (const f of active) {
+        // "fair" is recomputed live against today, not the static build-time tag.
+        if (f === "fair") { if (!upcomingFairs(s).length) return false; }
+        else if (!s.criteria.includes(f)) return false;
+      }
       return true;
     }
 
@@ -285,6 +331,20 @@ TEMPLATE = r"""<!DOCTYPE html>
       const wrap = document.createElement("span"); wrap.className="row__chevron";
       wrap.appendChild(s); return wrap;
     }
+    function calIcon() {
+      const s = document.createElementNS("http://www.w3.org/2000/svg","svg");
+      s.setAttribute("viewBox","0 0 24 24"); s.setAttribute("fill","none");
+      s.setAttribute("stroke","currentColor"); s.setAttribute("stroke-width","1.5");
+      s.setAttribute("stroke-linecap","round"); s.setAttribute("stroke-linejoin","round");
+      for (const d of ["M8 2v4","M16 2v4","M3 9h18"]) {
+        const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+        p.setAttribute("d", d); s.appendChild(p);
+      }
+      const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      r.setAttribute("x","3"); r.setAttribute("y","4"); r.setAttribute("width","18");
+      r.setAttribute("height","18"); r.setAttribute("rx","2"); s.appendChild(r);
+      return s;
+    }
 
     function render() {
       const list = SCHOOLS.filter(matches);
@@ -294,6 +354,9 @@ TEMPLATE = r"""<!DOCTYPE html>
         btn.type = "button"; btn.className = "row"; btn.setAttribute("role","row");
         btn.setAttribute("aria-label", `${s.name}, ${s.count} hires`);
 
+        const main = document.createElement("span");
+        main.className = "row__main";
+
         const nameWrap = document.createElement("span");
         nameWrap.className = "row__name-wrap";
         const nm = document.createElement("span");
@@ -302,13 +365,26 @@ TEMPLATE = r"""<!DOCTYPE html>
         if (s.criteria.includes("ranked")) nameWrap.appendChild(tag("ranked"));
         if (s.criteria.includes("ny")) nameWrap.appendChild(tag("ny"));
         if (s.criteria.includes("sf")) nameWrap.appendChild(tag("sf"));
+        main.appendChild(nameWrap);
+
+        const nextFair = upcomingFairs(s)[0];
+        if (nextFair) {
+          const sub = document.createElement("span");
+          sub.className = "row__sub";
+          sub.appendChild(calIcon());
+          const dt = document.createElement("b"); dt.textContent = fmtDate(nextFair.date);
+          const nmn = document.createElement("span");
+          nmn.className = "row__sub-name"; nmn.textContent = " · " + nextFair.name;
+          sub.appendChild(dt); sub.appendChild(nmn);
+          main.appendChild(sub);
+        }
 
         const hires = document.createElement("span");
         hires.className = "row__hires";
         hires.textContent = s.count === 0 ? "No hires yet"
                           : `${s.count} hire${s.count === 1 ? "" : "s"}`;
 
-        btn.appendChild(nameWrap);
+        btn.appendChild(main);
         btn.appendChild(hires);
         btn.appendChild(chevron());
         btn.addEventListener("click", () => openDetail(s));
@@ -346,7 +422,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       hc.textContent = s.count === 0 ? "No hires yet"
                      : `${s.count} hire${s.count === 1 ? "" : "s"}`;
       modalMeta.appendChild(hc);
-      ["ranked","ny","sf","hired"].forEach(k => {
+      ["ranked","ny","sf","extra","hired"].forEach(k => {
         if (s.criteria.includes(k)) {
           const sep = document.createElement("span"); sep.textContent = "·"; sep.setAttribute("aria-hidden","true");
           modalMeta.appendChild(sep); modalMeta.appendChild(tag(k));
@@ -354,6 +430,42 @@ TEMPLATE = r"""<!DOCTYPE html>
       });
 
       modalBody.textContent = "";
+
+      // Upcoming career fairs (recomputed against today).
+      const fairs = upcomingFairs(s);
+      if (fairs.length) {
+        const wrap = document.createElement("div"); wrap.className = "fairs";
+        const t = document.createElement("p"); t.className = "fairs__title";
+        t.textContent = `Upcoming career fair${fairs.length === 1 ? "" : "s"} (${fairs.length})`;
+        wrap.appendChild(t);
+        fairs.forEach(f => {
+          const [y, m, d] = f.date.split("-").map(Number);
+          const row = document.createElement("div"); row.className = "fair";
+          const dbox = document.createElement("div"); dbox.className = "fair__date";
+          const mm = document.createElement("div"); mm.className = "fair__date-m";
+          mm.textContent = new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short" });
+          const dd = document.createElement("div"); dd.className = "fair__date-d"; dd.textContent = d;
+          const yy = document.createElement("div"); yy.className = "fair__date-y"; yy.textContent = y;
+          dbox.appendChild(mm); dbox.appendChild(dd); dbox.appendChild(yy);
+
+          const body = document.createElement("div"); body.className = "fair__body";
+          const fn = document.createElement("div"); fn.className = "fair__name"; fn.textContent = f.name;
+          body.appendChild(fn);
+          if (f.location) {
+            const lc = document.createElement("div"); lc.className = "fair__loc"; lc.textContent = f.location;
+            body.appendChild(lc);
+          }
+          if (f.source) {
+            const sc = document.createElement("div"); sc.className = "fair__src";
+            const a = document.createElement("a"); a.href = f.source; a.target = "_blank";
+            a.rel = "noopener"; a.textContent = "Source / register";
+            sc.appendChild(a); body.appendChild(sc);
+          }
+          row.appendChild(dbox); row.appendChild(body);
+          wrap.appendChild(row);
+        });
+        modalBody.appendChild(wrap);
+      }
       if (!s.hires.length) {
         const e = document.createElement("div");
         e.className = "modal__emptystate";
@@ -361,6 +473,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         if (s.criteria.includes("ranked")) parts.push("a top-100 national university");
         if (s.criteria.includes("ny")) parts.push("a New York State institution");
         if (s.criteria.includes("sf")) parts.push("a San Francisco institution");
+        if (s.criteria.includes("extra")) parts.push("tracked for career-fair coverage");
         e.textContent = "No hires from this school yet — it's a target because it's "
           + (parts.join(" and ") || "in scope") + ".";
         modalBody.appendChild(e);

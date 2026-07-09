@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """
-Scheduled career-fair scraper.
+Scheduled career-fair scraper — live per-college updates.
 
-Fetches each college's public career-center page(s), extracts fair dates, and
-merges anything new into career_fairs.json. Also regenerates the FAIRS_FALLBACK
-block embedded in campus-recruiting-directory.html so the file:// fallback stays
-in sync.
+For every college already in career_fairs.json, fetches that college's public
+career-center page(s), extracts upcoming fair dates, and merges anything new
+back into career_fairs.json. career_fairs.json is the single source of truth;
+the directory (campus-recruiting-directory.html) is regenerated from it by
+build_directory.py, so this script only touches the JSON.
 
 Design notes / honest limits
 ----------------------------
-* Merge is ADDITIVE and SAFE: existing rows are never deleted (past fairs are
-  kept as history). New rows are appended only when (college, date) is not
-  already present. This means a bad scrape can add noise but can't wipe curated
-  data — review the diff the GitHub Action commits.
+* Merge is ADDITIVE and SAFE: existing rows are never deleted. New rows are
+  appended only when (college, date) is not already present, so a bad scrape can
+  add noise but can't wipe curated data — review the diff the Action commits.
+* Only UPCOMING fairs (date >= today) are added; the feed is forward-looking.
 * The default extractor is GENERIC: it looks for date strings that appear near
-  career-fair keywords. It is deliberately conservative but will still miss
-  JavaScript-rendered pages (many Handshake-backed calendars) and won't produce
-  great fair *names*. For good results, add a site-specific function to
-  EXTRACTORS below.
+  career-fair keywords, and skips obviously niche fairs (nursing, accounting,
+  MBA-only, etc.) to match the directory's general + tech/STEM scope. It will
+  still miss JavaScript-rendered pages (many Handshake / Symplicity calendars)
+  and won't always produce clean fair *names*. For good results, add a
+  site-specific function to EXTRACTORS below.
 * Auto-added rows are tagged {"auto": true, "scraped_at": "<date>"} so you can
   tell them apart from curated rows and prune them if needed.
 
@@ -39,7 +41,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 JSON_PATH = ROOT / "career_fairs.json"
-HTML_PATH = ROOT / "campus-recruiting-directory.html"
 
 TODAY = dt.date.today()
 # Only accept plausible dates: last year through two years out. Anything else is
@@ -49,7 +50,17 @@ MAX_DATE = TODAY + dt.timedelta(days=730)
 
 KEYWORDS = re.compile(
     r"career fair|career expo|job fair|internship fair|job & internship|"
-    r"recruit|talent connect|industrial roundtable|career night|career day",
+    r"recruit|talent connect|industrial roundtable|career night|career day|"
+    r"hiring expo|engineering expo|tech fair|stem",
+    re.I,
+)
+
+# Skip obviously niche fairs so the feed stays scoped to general + tech/STEM,
+# matching the curated directory. A block matching any of these is dropped.
+NEGATIVE = re.compile(
+    r"\b(nursing|accounting|cpa|mba|business school|law school|pre-?law|"
+    r"education|teacher|educator|hospitality|supply chain|doctoral|postdoc|"
+    r"graduate school fair|health(care)? professions|pharmacy|dental|nurse)\b",
     re.I,
 )
 
@@ -135,6 +146,8 @@ def generic_extractor(html: str, college: str, url: str) -> list[dict]:
             continue
         if not KEYWORDS.search(block):
             continue
+        if NEGATIVE.search(block):     # niche fair — out of scope
+            continue
         dates = find_dates(block)
         if not dates:
             continue
@@ -167,11 +180,10 @@ EXTRACTORS: dict[str, callable] = {
 # (Handshake / 12twenty) or a bot wall, and Valon has no API access. These are
 # maintained by hand: add/update curated rows for them in career_fairs.json.
 # The scraper skips them so it never wastes requests or writes junk here.
+# (Sources that merely serve a login-gated Symplicity/Handshake calendar don't
+# need to be listed — the generic extractor just finds no dates and moves on.)
 MANUAL_COLLEGES = {
-    "UC Berkeley",    # dates in Handshake (school login)
-    "Arizona State",  # dates in 12twenty (school login)
-    "Northeastern",   # dates in Handshake (school login)
-    "Michigan",       # career-center site behind a WAF (returns 403 to bots)
+    "University of Michigan",   # career-center site behind a WAF (403 to bots)
 }
 
 
@@ -228,7 +240,10 @@ def merge(existing: list[dict], scraped: list[dict]) -> tuple[list[dict], list[d
     have = {(f["college"], f["date"]) for f in existing}
     added: list[dict] = []
     stamp = TODAY.isoformat()
+    today_iso = TODAY.isoformat()
     for row in scraped:
+        if row["date"] < today_iso:      # only ever add upcoming fairs
+            continue
         key = (row["college"], row["date"])
         if key in have:
             continue
@@ -249,35 +264,11 @@ def write_json(data: dict, fairs: list[dict]) -> None:
                          encoding="utf-8")
 
 
-def write_fallback(fairs: list[dict]) -> bool:
-    """Regenerate the FAIRS_FALLBACK array between markers in the HTML.
-    Returns True if the file changed."""
-    html = HTML_PATH.read_text(encoding="utf-8")
-    start = "/* FAIRS_FALLBACK_START */"
-    end = "/* FAIRS_FALLBACK_END */"
-    if start not in html or end not in html:
-        print("  ! FAIRS_FALLBACK markers not found; skipping HTML sync", file=sys.stderr)
-        return False
-
-    lines = ["    const FAIRS_FALLBACK = ["]
-    for f in fairs:
-        parts = [
-            f'college: {json.dumps(f["college"], ensure_ascii=False)}',
-            f'name: {json.dumps(f["name"], ensure_ascii=False)}',
-            f'date: {json.dumps(f["date"])}',
-            f'location: {json.dumps(f.get("location", ""), ensure_ascii=False)}',
-            f'source: {json.dumps(f.get("source", ""), ensure_ascii=False)}',
-        ]
-        lines.append("      { " + ", ".join(parts) + " },")
-    lines.append("    ];")
-    block = f"{start}\n" + "\n".join(lines) + f"\n    {end}"
-
-    new_html = re.sub(re.escape(start) + r".*?" + re.escape(end), block, html,
-                      flags=re.S)
-    if new_html != html:
-        HTML_PATH.write_text(new_html, encoding="utf-8")
-        return True
-    return False
+def prune_past(fairs: list[dict]) -> tuple[list[dict], int]:
+    """Drop fairs that have already happened; the feed is forward-looking."""
+    today_iso = TODAY.isoformat()
+    kept = [f for f in fairs if f.get("date", "") >= today_iso]
+    return kept, len(fairs) - len(kept)
 
 
 # ----------------------------------------------------------------------------
@@ -295,24 +286,26 @@ def main() -> int:
 
     scraped = scrape(existing, use_net=not args.no_net)
     merged, added = merge(existing, scraped)
+    merged, pruned = prune_past(merged)
 
     print(f"\n{len(added)} new fair(s) discovered:")
     for f in added:
         print(f"  + {f['college']} {f['date']} — {f['name']}")
+    if pruned:
+        print(f"{pruned} past fair(s) pruned from the feed.")
 
     if args.dry_run:
         print("\n(--dry-run) no files written.")
         return 0
 
-    if not added:
-        print("\nNothing new; files unchanged.")
+    if not added and not pruned:
+        print("\nNothing new; file unchanged.")
         return 0
 
     data["last_scraped"] = TODAY.isoformat()
     write_json(data, merged)
-    changed = write_fallback(merged)
-    print(f"\nWrote {JSON_PATH.name}"
-          + (f" and updated fallback in {HTML_PATH.name}" if changed else ""))
+    print(f"\nWrote {JSON_PATH.name} "
+          f"({len(added)} added, {pruned} pruned, {len(merged)} total).")
     return 0
 
 

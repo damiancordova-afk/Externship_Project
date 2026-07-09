@@ -22,6 +22,7 @@ from collections import defaultdict
 
 CSV = "ashby_candidate_list.csv"
 OUT = "campus-recruiting-directory.html"
+FAIRS = "career_fairs.json"   # upcoming career-fair feed (source of truth)
 
 # Source used for the Top-100 inclusion set. We use only the *set of institution
 # names* for membership testing - not the ranked order.
@@ -127,6 +128,20 @@ SF_FOUR_YEAR = [
     "Academy of Art University",
     "Golden Gate University",
     "San Francisco Conservatory of Music",
+]
+
+# --- Criterion 3: extra schools tracked for career-fair coverage --------------
+# Not in the ranked / NY / SF criteria, but they appear in career_fairs.json
+# (Valon wants campus-recruiting coverage there), so they get a directory row.
+EXTRA_TRACKED = [
+    "San Jose State University",
+    "University of Cincinnati",
+    "University of Minnesota Duluth",
+    "University of Rhode Island",
+    "University of Texas at Dallas",
+    "University of Texas at San Antonio",
+    "University of Utah",
+    "University of Washington Bothell",
 ]
 
 # --- Alias map: normalized-key -> official display name -----------------------
@@ -277,12 +292,51 @@ def extract_contacts(row):
 
 # Build official-name lookup (norm_key -> display) from all inclusion lists.
 OFFICIAL = {}
-for nm in TOP_NATIONAL + NY_FOUR_YEAR + SF_FOUR_YEAR:
+for nm in TOP_NATIONAL + NY_FOUR_YEAR + SF_FOUR_YEAR + EXTRA_TRACKED:
     OFFICIAL.setdefault(norm_key(nm), nm)
 
 TOP_KEYS = {norm_key(n) for n in TOP_NATIONAL}
 NY_KEYS = {norm_key(n) for n in NY_FOUR_YEAR}
 SF_KEYS = {norm_key(n) for n in SF_FOUR_YEAR}
+EXTRA_KEYS = {norm_key(n) for n in EXTRA_TRACKED}
+
+
+def load_fairs():
+    """Load career_fairs.json and group upcoming fairs by school norm_key.
+
+    Returns (fairs_by_key, meta) where fairs_by_key maps a school's norm_key to a
+    date-sorted list of fair dicts. College names in the feed are matched to the
+    directory via the same alias/official normalization used for the CSV, so the
+    feed can use official names or known aliases.
+    """
+    import datetime as _dt
+    try:
+        with open(FAIRS) as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"! {FAIRS} not found; directory will have no career-fair data")
+        return {}, {}
+
+    today = _dt.date.today().isoformat()
+    by_key = defaultdict(list)
+    for fair in data.get("fairs", []):
+        if fair.get("date", "") < today:      # only surface upcoming fairs
+            continue
+        # Reuse canonicalize() so feed names resolve through aliases -> official.
+        matches = canonicalize(fair.get("college", ""))
+        if not matches:
+            continue
+        _, k = matches[0]
+        by_key[k].append({
+            "name": fair.get("name", "Career fair"),
+            "date": fair["date"],
+            "location": fair.get("location", ""),
+            "source": fair.get("source", ""),
+        })
+    for k in by_key:
+        by_key[k].sort(key=lambda x: x["date"])
+    meta = {"note": data.get("note", ""), "lastScraped": data.get("last_scraped")}
+    return by_key, meta
 
 
 def main():
@@ -310,8 +364,11 @@ def main():
                 rec["person_ids"].add(pid)
                 rec["hires"].append(hire)
 
-    # Seed 0-hire schools from the target-list criteria.
-    for k in TOP_KEYS | NY_KEYS | SF_KEYS:
+    # Career-fair feed: upcoming fairs grouped by school key.
+    fairs_by_key, fairs_meta = load_fairs()
+
+    # Seed 0-hire schools from the target-list criteria (incl. fair-only schools).
+    for k in TOP_KEYS | NY_KEYS | SF_KEYS | EXTRA_KEYS | set(fairs_by_key):
         schools[k]  # touch to create empty record
 
     # Finalize records.
@@ -323,6 +380,7 @@ def main():
             display = max(rec["keys_seen"].items(), key=lambda kv: (kv[1], len(kv[0])))[0]
         else:
             display = k.title()
+        fairs = fairs_by_key.get(k, [])
         criteria = []
         if k in TOP_KEYS:
             criteria.append("ranked")
@@ -330,12 +388,17 @@ def main():
             criteria.append("ny")
         if k in SF_KEYS:
             criteria.append("sf")
+        if k in EXTRA_KEYS:
+            criteria.append("extra")
+        if fairs:
+            criteria.append("fair")
         if rec["hires"]:
             criteria.append("hired")
         out.append({
             "name": display,
             "count": len(rec["person_ids"]),
             "criteria": criteria,
+            "fairs": fairs,
             "hires": sorted(rec["hires"], key=lambda h: (h["name"] or "").lower()),
         })
 
@@ -352,13 +415,18 @@ def main():
     print(f"  ranked (Top-100):       {sum(1 for s in out if 'ranked' in s['criteria'])}")
     print(f"  NY 4-year:              {sum(1 for s in out if 'ny' in s['criteria'])}")
     print(f"  SF 4-year:              {sum(1 for s in out if 'sf' in s['criteria'])}")
+    print(f"  extra (fair coverage):  {sum(1 for s in out if 'extra' in s['criteria'])}")
+    fair_schools = sum(1 for s in out if 'fair' in s['criteria'])
+    fair_count = sum(len(s['fairs']) for s in out)
+    print(f"  with upcoming fair:     {fair_schools} ({fair_count} fairs total)")
     print(f"Top 5 by hires:           " +
           ", ".join(f"{s['name']} ({s['count']})" for s in out[:5]))
 
     payload = {"generatedFrom": CSV, "rankingSource": RANKING_SOURCE,
                "totalSchools": total_schools, "schoolsWithHires": with_hires,
                "candidateCount": int(len(df)), "missingSchool": int(missing_school),
-               "schools": out}
+               "schoolsWithFair": fair_schools, "fairCount": fair_count,
+               "fairsMeta": fairs_meta, "schools": out}
 
     tpl = TEMPLATE.replace("__DATA__", json.dumps(payload))
     tpl = tpl.replace("__RANKING_SOURCE__", html.escape(RANKING_SOURCE))
