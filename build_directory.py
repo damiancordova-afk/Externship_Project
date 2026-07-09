@@ -207,6 +207,24 @@ _ALIAS_RAW = {
     "arizona school of real estate business": "Arizona School of Real Estate and Business",
     "wharton": "The Wharton School",
     "uc": "University of California",   # bare "UC" -> UC system (labeled ambiguous below)
+    # --- Same-institution duplicates (spelling / naming variants) -------------
+    "columbia university school of law": "Columbia Law School",
+    "cal state northridge": "California State University, Northridge",
+    "california state northridge": "California State University, Northridge",
+    "university of binghamton": "Binghamton University",
+    "washington state": "Washington State University",
+    "utica college": "Utica University",
+    "city university of new york college of staten island": "College of Staten Island",
+    "cuny college of staten island": "College of Staten Island",
+    # --- Extension / continuing-ed schools -> parent university --------------
+    "harvard extension school": "Harvard University",
+    "ucla extension": "University of California, Los Angeles",
+    "uc berkeley extension": "University of California, Berkeley",
+    "nyu school of professional studies": "New York University",
+    # --- Duplicate spellings of the SAME professional school (kept separate
+    #     from the parent, but deduped with each other) ----------------------
+    "texas mccombs school of business": "McCombs School of Business",
+    "new york university leonard n stern school of business": "Stern School of Business",
 }
 
 # Ambiguous entries with no resolvable campus: kept, but clearly labeled.
