@@ -1,0 +1,10 @@
+# Raw hiring data pulled from Ashby — contains candidate PII, never commit
+ashby_*.csv
+
+# Generated directory page — contains real candidate names/contacts (PII)
+campus-recruiting-directory.html
+
+# Python
+__pycache__/
+*.pyc
+.venv/
