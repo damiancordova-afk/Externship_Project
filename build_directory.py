@@ -194,7 +194,42 @@ _ALIAS_RAW = {
     "sfsu": "San Francisco State University",
     "sf state": "San Francisco State University",
     "cca": "California College of the Arts",
+    # Merge only the interchangeable undergrad/general Harvard names.
+    # (Harvard Business/Law/Extension etc. stay as their own entries.)
+    "harvard": "Harvard University",
+    "harvard college": "Harvard University",
+    # Unambiguous typo / spelling / casing fixes (same institution).
+    "arizona state": "Arizona State University",
+    "university of north carolina chapelhill": "University of North Carolina at Chapel Hill",
+    "central arizona community college": "Central Arizona College",
+    "cal state northridge": "California State University, Northridge",
+    "cal state university northridge": "California State University, Northridge",
+    "arizona school of real estate business": "Arizona School of Real Estate and Business",
+    "wharton": "The Wharton School",
+    "uc": "University of California",   # bare "UC" -> UC system (labeled ambiguous below)
 }
+
+# Ambiguous entries with no resolvable campus: kept, but clearly labeled.
+_AMBIGUOUS = {
+    "university california": "University of California (campus unspecified)",
+    "california state university": "California State University (campus unspecified)",
+    "university": "Unspecified university",   # from bare "The University"
+}
+
+# Ambiguous / can't-verify school keys. Rule: if a candidate's school is one of
+# these AND they have no LinkedIn to verify against, drop them (per request).
+# Those WITH a LinkedIn are kept (labeled) pending manual resolution.
+_REMOVABLE_AMBIGUOUS = set(_AMBIGUOUS) | {"ucl"}
+
+# Manual per-candidate school overrides, keyed by Ashby candidate id, loaded from
+# a git-ignored file so candidate ids never land in tracked code. Format:
+#   { "candidate-id": "Real University Name", ... }
+_RESOLVE_BY_ID = {}
+try:
+    with open("ashby_overrides.json") as _f:
+        _RESOLVE_BY_ID = json.load(_f)
+except FileNotFoundError:
+    pass
 
 
 def parse(v):
@@ -219,6 +254,12 @@ def norm_key(s):
 
 _ALIAS_KEYS = {norm_key(k): v for k, v in _ALIAS_RAW.items()}
 _SUBCOLLEGE = re.compile(r",\s*(college|school|graduate school|faculty|division)\s+of\s+.*$", re.I)
+# General undergraduate college (arts & sciences / liberal arts) -> fold to parent,
+# e.g. "Duke University, Trinity College of Arts and Sciences" -> "Duke University".
+# Named graduate/professional schools (Business/Law/Engineering) are NOT matched.
+_ARTS_SCI = re.compile(
+    r",\s*[^,]*?(arts\s*(?:and|&)\s*sciences|liberal arts|letters\s+and\s+science)[^,]*$",
+    re.I)
 
 
 def split_multi(raw):
@@ -243,7 +284,12 @@ def canonicalize(raw):
     """Return list of (display_name, key) for one raw school cell (may be multiple)."""
     out = []
     for part in split_multi(raw):
+        # Exclude non-colleges (high schools) - this is a college directory.
+        # Catches "High School", "Senior High", and "HS"/"H.S." abbreviations.
+        if re.search(r"\b(high school|senior high|junior high|h\.?s\.?)\b", part, re.I):
+            continue
         part = _SUBCOLLEGE.sub("", part).strip()
+        part = _ARTS_SCI.sub("", part).strip()   # undergrad A&S college -> parent
         if not part:
             continue
         k = norm_key(part)
@@ -304,10 +350,8 @@ EXTRA_KEYS = {norm_key(n) for n in EXTRA_TRACKED}
 def load_fairs():
     """Load career_fairs.json and group upcoming fairs by school norm_key.
 
-    Returns (fairs_by_key, meta) where fairs_by_key maps a school's norm_key to a
-    date-sorted list of fair dicts. College names in the feed are matched to the
-    directory via the same alias/official normalization used for the CSV, so the
-    feed can use official names or known aliases.
+    Feed college names resolve through the same alias/official normalization as
+    the CSV, so the feed can use official names or known aliases.
     """
     import datetime as _dt
     try:
@@ -322,7 +366,6 @@ def load_fairs():
     for fair in data.get("fairs", []):
         if fair.get("date", "") < today:      # only surface upcoming fairs
             continue
-        # Reuse canonicalize() so feed names resolve through aliases -> official.
         matches = canonicalize(fair.get("college", ""))
         if not matches:
             continue
@@ -357,7 +400,12 @@ def main():
         name = row.get("name")
         hire = {"name": (None if pd.isna(name) else str(name)),
                 "contacts": contacts}
-        for disp, k in canonicalize(raw):
+        raw_eff = _RESOLVE_BY_ID.get(pid, raw)          # manual correction wins
+        has_linkedin = any(ct["kind"] == "linkedin" for ct in contacts)
+        for disp, k in canonicalize(raw_eff):
+            # Ambiguous school + no LinkedIn to verify against -> drop the person.
+            if k in _REMOVABLE_AMBIGUOUS and not has_linkedin:
+                continue
             rec = schools[k]
             rec["keys_seen"][disp] += 1
             if pid not in rec["person_ids"]:
@@ -374,7 +422,9 @@ def main():
     # Finalize records.
     out = []
     for k, rec in schools.items():
-        if OFFICIAL.get(k):
+        if k in _AMBIGUOUS:
+            display = _AMBIGUOUS[k]
+        elif OFFICIAL.get(k):
             display = OFFICIAL[k]
         elif rec["keys_seen"]:
             display = max(rec["keys_seen"].items(), key=lambda kv: (kv[1], len(kv[0])))[0]
