@@ -239,6 +239,23 @@
       color: var(--white);
     }
 
+    /* Filter inputs (date / number ranges) */
+    .filter-input {
+      height: 32px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-input);
+      background: var(--white);
+      padding: 4px 10px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--ink);
+      transition: border-color var(--ease);
+    }
+    .filter-input:hover { border-color: var(--border-hover); }
+    .filter-input::placeholder { color: var(--text-secondary); }
+    .filter-input--num { width: 72px; }
+    .filter-sep { color: var(--text-label); font-size: 14px; }
+
     /* ============================================================
        Table container
        ============================================================ */
@@ -623,11 +640,16 @@
         <button class="pill" type="button" data-tier="2" aria-pressed="false">Tier 2</button>
         <button class="pill" type="button" data-tier="3" aria-pressed="false">Tier 3</button>
       </div>
-      <div class="filters" role="group" aria-label="Sort schools">
-        <span class="filters__label">Sort</span>
-        <button class="pill" type="button" data-sort="hires" aria-pressed="true">Most hires</button>
-        <button class="pill" type="button" data-sort="recentFair" aria-pressed="false">Most recent career fair</button>
-        <button class="pill" type="button" data-sort="upcomingFair" aria-pressed="false">Upcoming career fair</button>
+      <div class="filters" role="group" aria-label="Filter by career fair date">
+        <span class="filters__label">Fair dates</span>
+        <input type="date" id="dateFrom" class="filter-input" aria-label="Fairs on or after date" />
+        <span class="filter-sep" aria-hidden="true">–</span>
+        <input type="date" id="dateTo" class="filter-input" aria-label="Fairs on or before date" />
+      </div>
+      <div class="filters" role="group" aria-label="Filter by number of hires">
+        <span class="filters__label">Hires</span>
+        <input type="number" id="hiresMin" class="filter-input filter-input--num" min="0" inputmode="numeric" placeholder="Min" aria-label="Minimum hires" />
+        <button class="pill" type="button" id="clearFilters">Clear all</button>
       </div>
     </div>
 
@@ -808,12 +830,16 @@
     // State
     // ------------------------------------------------------------
     let query = "";
-    let sortBy = "hires"; // "hires" | "recentFair" | "upcomingFair"
     let ALL_FAIRS = FAIRS_FALLBACK; // replaced by career_fairs.json when available
+
+    // Filters
+    const activeTiers = new Set();
+    let dateFrom = "";   // ISO YYYY-MM-DD, inclusive lower bound on fair date
+    let dateTo = "";     // ISO YYYY-MM-DD, inclusive upper bound on fair date
+    let hiresMin = "";   // string; "" means no bound
 
     // Today as an ISO string (YYYY-MM-DD) for comparing fair dates
     const TODAY_ISO = new Date().toLocaleDateString("en-CA");
-    const activeTiers = new Set();
 
     const rowsEl = document.getElementById("rows");
     const emptyEl = document.getElementById("empty");
@@ -828,30 +854,40 @@
       return fairFmt.format(new Date(y, m - 1, d));
     }
 
+    function dateFilterActive() { return !!(dateFrom || dateTo); }
+
+    // Earliest fair (allFairs is sorted ascending) that falls within the
+    // active [dateFrom, dateTo] window; null if none. Used both to decide
+    // whether a school passes the date filter and what date to display.
+    function fairInRange(s) {
+      if (!s.allFairs) return null;
+      return s.allFairs.find(f =>
+        (!dateFrom || f.date >= dateFrom) &&
+        (!dateTo || f.date <= dateTo)) || null;
+    }
+
     function filtered() {
       const q = query.trim().toLowerCase();
+      const min = hiresMin === "" ? -Infinity : Number(hiresMin);
+      const dateOn = dateFilterActive();
+
       const list = SCHOOLS.filter(s => {
         const matchQ = !q || s.name.toLowerCase().includes(q);
         const matchT = activeTiers.size === 0 || activeTiers.has(s.tier);
-        return matchQ && matchT;
+        const matchH = s.hires >= min;
+        const matchD = !dateOn || !!fairInRange(s);
+        return matchQ && matchT && matchH && matchD;
       });
 
+      // Default order: when a date window is active, soonest matching fair
+      // first; otherwise most hires first.
       list.sort((a, b) => {
-        if (sortBy === "recentFair") {
-          // Most recent (past) career fair first; schools with none sink down
-          const ad = a.lastFairObj && a.lastFairObj.date;
-          const bd = b.lastFairObj && b.lastFairObj.date;
-          if (!ad || !bd) return ad ? -1 : bd ? 1 : 0;
-          return bd.localeCompare(ad);
+        if (dateOn) {
+          const ad = fairInRange(a).date;
+          const bd = fairInRange(b).date;
+          if (ad !== bd) return ad.localeCompare(bd);
         }
-        if (sortBy === "upcomingFair") {
-          // Soonest upcoming fair first; schools with none sink to the bottom
-          const ad = a.nextFairObj && a.nextFairObj.date;
-          const bd = b.nextFairObj && b.nextFairObj.date;
-          if (!ad || !bd) return ad ? -1 : bd ? 1 : 0;
-          return ad.localeCompare(bd);
-        }
-        return b.hires - a.hires; // most hires first
+        return b.hires - a.hires;
       });
 
       return list;
@@ -872,14 +908,14 @@
         btn.type = "button";
         btn.className = "row";
         btn.setAttribute("role", "row");
-        // Default view highlights the NEXT (upcoming) fair; the
-        // "recent" sort flips it to show the most recent past fair.
-        const showUpcoming = sortBy !== "recentFair";
-        const fairObj = showUpcoming ? s.nextFairObj : s.lastFairObj;
-        const fairLabel = showUpcoming ? "Next fair" : "Last fair";
+        // With a date window active, show the matching fair; otherwise
+        // show the next upcoming fair.
+        const dateOn = dateFilterActive();
+        const fairObj = dateOn ? fairInRange(s) : s.nextFairObj;
+        const fairLabel = dateOn ? "Fair" : "Next fair";
         const fairText = fairObj
           ? `${fairLabel} · ${formatFair(fairObj.date)}`
-          : `No ${showUpcoming ? "upcoming" : "past"} fair listed`;
+          : "No upcoming fair listed";
         btn.setAttribute("aria-label",
           `${s.name}, ${TIER_LABEL[s.tier]}, ${s.hires} hires, ${fairText}`);
         btn.innerHTML = `
@@ -1007,15 +1043,24 @@
       });
     });
 
-    // Sort pills — single-select (radio-like)
-    const sortPills = document.querySelectorAll(".pill[data-sort]");
-    sortPills.forEach(pill => {
-      pill.addEventListener("click", () => {
-        sortBy = pill.dataset.sort;
-        sortPills.forEach(p =>
-          p.setAttribute("aria-pressed", String(p === pill)));
-        render();
-      });
+    // Date-range filter
+    const dateFromEl = document.getElementById("dateFrom");
+    const dateToEl = document.getElementById("dateTo");
+    dateFromEl.addEventListener("input", e => { dateFrom = e.target.value; render(); });
+    dateToEl.addEventListener("input", e => { dateTo = e.target.value; render(); });
+
+    // Minimum-hires filter
+    const hiresMinEl = document.getElementById("hiresMin");
+    hiresMinEl.addEventListener("input", e => { hiresMin = e.target.value; render(); });
+
+    // Clear all filters (tiers, dates, hires) — leaves the search box alone
+    document.getElementById("clearFilters").addEventListener("click", () => {
+      activeTiers.clear();
+      document.querySelectorAll(".pill[data-tier]").forEach(p =>
+        p.setAttribute("aria-pressed", "false"));
+      dateFrom = dateTo = hiresMin = "";
+      dateFromEl.value = dateToEl.value = hiresMinEl.value = "";
+      render();
     });
 
     // ------------------------------------------------------------
