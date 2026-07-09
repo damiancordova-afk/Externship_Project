@@ -420,6 +420,79 @@
       font-size: 12px;
       color: var(--text-label);
     }
+
+    /* Career-fair list inside the detail modal */
+    .modal__fairs { margin-bottom: 16px; }
+    .modal__fairs-head {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-label);
+      margin-bottom: 12px;
+    }
+    .modal__fairs-empty {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .fair-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fair-item {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
+      background: var(--white);
+    }
+    .fair-item--past { opacity: 0.6; }
+    .fair-item__main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .fair-item__date {
+      font-size: 14px;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .fair-item__badge {
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(34, 139, 76, 0.16);
+      color: #1B7A44;
+    }
+    .fair-item__badge--past {
+      background: var(--n-200);
+      color: var(--n-700);
+    }
+    .fair-item__name {
+      font-size: 14px;
+      color: var(--text-body);
+      letter-spacing: -0.1px;
+    }
+    .fair-item__loc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .fair-item__src {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--gold-600);
+      text-decoration: none;
+    }
+    .fair-item__src:hover { text-decoration: underline; }
     .modal__actions {
       display: flex;
       gap: 8px;
@@ -593,10 +666,8 @@
           </svg>
         </button>
       </div>
-      <div class="modal__placeholder">
-        School detail placeholder
-        <div style="margin-top:8px;" class="modal__id" id="modalId"></div>
-      </div>
+      <div class="modal__fairs" id="modalFairs"></div>
+      <div class="modal__id" id="modalId" style="margin-bottom:24px;"></div>
       <div class="modal__actions">
         <button class="btn btn--secondary" type="button" id="modalCloseBtn">Close</button>
         <button class="btn btn--primary" type="button">View full profile</button>
@@ -634,33 +705,111 @@
 
   <script>
     // ------------------------------------------------------------
-    // Mock data
+    // Schools. Hires are mock; career-fair dates are NOT stored here —
+    // they are derived at load time from the shared fair feed
+    // (career_fairs.json) via each school's `fairKey`.
     // ------------------------------------------------------------
     const SCHOOLS = [
-      { id: "SCH-001", name: "Stanford University", tier: 1, hires: 24, lastFair: "2026-04-15", nextFair: "2026-09-22" },
-      { id: "SCH-002", name: "Massachusetts Institute of Technology", tier: 1, hires: 21, lastFair: "2026-03-28", nextFair: "2026-09-15" },
-      { id: "SCH-003", name: "University of California, Berkeley", tier: 1, hires: 19, lastFair: "2026-05-02", nextFair: "2026-10-01" },
-      { id: "SCH-004", name: "Carnegie Mellon University", tier: 1, hires: 16, lastFair: "2026-02-10", nextFair: "2026-08-28" },
-      { id: "SCH-005", name: "University of Michigan", tier: 2, hires: 14, lastFair: "2025-10-18", nextFair: "2026-10-14" },
-      { id: "SCH-006", name: "Georgia Institute of Technology", tier: 2, hires: 12, lastFair: "2026-01-22", nextFair: "2026-09-08" },
-      { id: "SCH-007", name: "University of Texas at Austin", tier: 2, hires: 11, lastFair: "2025-11-05", nextFair: "2026-11-03" },
-      { id: "SCH-008", name: "University of Illinois Urbana-Champaign", tier: 2, hires: 9, lastFair: "2025-09-30", nextFair: "2026-09-29" },
-      { id: "SCH-009", name: "Purdue University", tier: 2, hires: 8, lastFair: "2026-06-12", nextFair: "2026-08-19" },
-      { id: "SCH-010", name: "Cornell University", tier: 1, hires: 15, lastFair: "2026-04-01", nextFair: "2026-09-17" },
-      { id: "SCH-011", name: "Arizona State University", tier: 3, hires: 6, lastFair: "2025-08-14", nextFair: "2026-08-11" },
-      { id: "SCH-012", name: "San José State University", tier: 3, hires: 5, lastFair: "2026-05-20", nextFair: "2026-10-06" },
-      { id: "SCH-013", name: "University of Washington", tier: 2, hires: 10, lastFair: "2026-03-11", nextFair: "2026-09-24" },
-      { id: "SCH-014", name: "Rutgers University", tier: 3, hires: 4, lastFair: "2025-07-25", nextFair: "2026-11-12" },
-      { id: "SCH-015", name: "Northeastern University", tier: 3, hires: 7, lastFair: "2026-06-28", nextFair: "2026-07-30" },
+      { id: "SCH-001", name: "Stanford University", tier: 1, hires: 24, fairKey: "Stanford" },
+      { id: "SCH-002", name: "Massachusetts Institute of Technology", tier: 1, hires: 21, fairKey: "MIT" },
+      { id: "SCH-003", name: "University of California, Berkeley", tier: 1, hires: 19, fairKey: "UC Berkeley" },
+      { id: "SCH-004", name: "Carnegie Mellon University", tier: 1, hires: 16, fairKey: "Carnegie Mellon" },
+      { id: "SCH-005", name: "University of Michigan", tier: 2, hires: 14, fairKey: "Michigan" },
+      { id: "SCH-006", name: "Georgia Institute of Technology", tier: 2, hires: 12, fairKey: "Georgia Tech" },
+      { id: "SCH-007", name: "University of Texas at Austin", tier: 2, hires: 11, fairKey: "UT Austin" },
+      { id: "SCH-008", name: "University of Illinois Urbana-Champaign", tier: 2, hires: 9, fairKey: "UIUC" },
+      { id: "SCH-009", name: "Purdue University", tier: 2, hires: 8, fairKey: "Purdue" },
+      { id: "SCH-010", name: "Cornell University", tier: 1, hires: 15, fairKey: "Cornell" },
+      { id: "SCH-011", name: "Arizona State University", tier: 3, hires: 6, fairKey: "Arizona State" },
+      { id: "SCH-012", name: "San José State University", tier: 3, hires: 5, fairKey: "San Jose State" },
+      { id: "SCH-013", name: "University of Washington", tier: 2, hires: 10, fairKey: "Washington" },
+      { id: "SCH-014", name: "Rutgers University", tier: 3, hires: 4, fairKey: "Rutgers" },
+      { id: "SCH-015", name: "Northeastern University", tier: 3, hires: 7, fairKey: "Northeastern" },
     ];
 
     const TIER_LABEL = { 1: "Tier 1", 2: "Tier 2", 3: "Tier 3" };
+
+    // ------------------------------------------------------------
+    // Career-fair feed
+    // ------------------------------------------------------------
+    // Single source of truth is career_fairs.json (a scraper can rewrite
+    // it — see scripts/refresh_fairs.md). We fetch it on load. The array
+    // below is an identical FALLBACK so the page still works when opened
+    // directly from disk (file://), where fetch() is blocked by the browser.
+    const FAIRS_FALLBACK = [
+      { college: "Stanford", name: "Spring On-Campus Career Fair", date: "2026-04-21", location: "McCaw Hall, Stanford Alumni Center", source: "https://careered.stanford.edu/events" },
+      { college: "Stanford", name: "Winter Career Fair", date: "2026-01-22", location: "Li Ka Shing Center, Berg Hall", source: "https://forum.stanford.edu/events/career-fair" },
+      { college: "MIT", name: "Fall Career Fair (FCF)", date: "2026-09-25", location: "Johnson Athletic Center", source: "https://capd.mit.edu/channels/fall-career-fair/" },
+      { college: "MIT", name: "Spring Career Night", date: "2026-02-26", location: "Sala de Puerto Rico, Stratton Student Center", source: "https://capd.mit.edu/spring-career-night-employer-information/" },
+      { college: "MIT", name: "EECS Career Fair", date: "2026-09-24", location: "TBD", source: "https://www.eecs.mit.edu/eecs-events/2026-eecs-career-fair/" },
+      { college: "UC Berkeley", name: "Spring Career Fair: STEM", date: "2026-01-27", location: "Recreational Sports Facility, Field House", source: "https://career.berkeley.edu/employers/recruit-at-cal/recruitment-events-and-career-fairs/" },
+      { college: "UC Berkeley", name: "Nonprofit, Environment & Public Service Fair", date: "2026-03-10", location: "Pauley Ballroom, MLK Student Union", source: "https://career.berkeley.edu/employers/recruit-at-cal/recruitment-events-and-career-fairs/" },
+      { college: "UC Berkeley", name: "Just In Time Career Fair", date: "2026-04-07", location: "Pauley Ballroom, MLK Jr. Student Union", source: "https://career.berkeley.edu/employers/recruit-at-cal/recruitment-events-and-career-fairs/" },
+      { college: "Arizona State", name: "Spring Undergraduate Career & Internship Fair", date: "2026-02-24", location: "Tempe, AZ", source: "https://career.eoss.asu.edu/channels/career-internship-fairs/" },
+      { college: "Arizona State", name: "Startup Career Fair (Change the World)", date: "2026-03-18", location: "Mountain America Stadium", source: "https://career.eoss.asu.edu/channels/career-internship-fairs/" },
+      { college: "Arizona State", name: "Summer 2026 Career Fair", date: "2026-04-13", location: "Student Pavilion, Senita Ballroom, Tempe", source: "https://career.eoss.asu.edu/channels/career-internship-fairs/" },
+      { college: "Michigan", name: "Fall Job & Internship Fair (Day 1)", date: "2026-09-09", location: "Michigan Union", source: "https://careercenter.umich.edu/content/job-and-internship-fairs" },
+      { college: "Michigan", name: "Fall Job & Internship Fair (Days 2-3)", date: "2026-09-14", location: "Michigan Union", source: "https://careercenter.umich.edu/content/job-and-internship-fairs" },
+      { college: "Michigan", name: "Engineering Career Fair", date: "2026-02-06", location: "Duderstadt Center / Engin. Career Resource Ctr", source: "https://career.engin.umich.edu/career-fairs-employers/" },
+      { college: "UT Austin", name: "Fall Engineering Expo", date: "2026-09-09", location: "Rec Sports Center", source: "https://cockrell.utexas.edu/student-life/career-services/career-fairs/" },
+      { college: "UT Austin", name: "Liberal Arts Career Fair", date: "2026-02-25", location: "Texas Union Ballroom", source: "https://liberalarts.utexas.edu/career-services/employers/fairs/" },
+      { college: "UT Austin", name: "UTSOA (Architecture) Career Fair", date: "2026-02-06", location: "AT&T Hotel and Conference Center", source: "https://soa.utexas.edu/events/utsoa-career-fair" },
+      { college: "Purdue", name: "Industrial Roundtable (In-Person)", date: "2026-09-15", location: "France A. Córdova Recreational Sports Center", source: "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs" },
+      { college: "Purdue", name: "Daniels School of Business Fall Career Fair", date: "2026-09-17", location: "West Lafayette, IN", source: "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs" },
+      { college: "Purdue", name: "Polytechnic Career Fair", date: "2026-02-04", location: "Purdue Memorial Union", source: "https://polytechnic.purdue.edu/events/purdue-polytechnic-career-fair" },
+      { college: "Georgia Tech", name: "All-Majors Career Fair (Fall)", date: "2026-09-14", location: "Campus Recreation Center (CRC)", source: "https://careerfair.gatech.edu/upcoming-career-fairs/" },
+      { college: "Georgia Tech", name: "College of Computing (CoC) Career Fair", date: "2026-09-17", location: "McCamish Pavilion", source: "https://careerfair.gatech.edu/upcoming-career-fairs/" },
+      { college: "Georgia Tech", name: "ECE Career Fair", date: "2026-09-18", location: "McCamish Pavilion", source: "https://ece.gatech.edu/careerfair" },
+      { college: "Cornell", name: "Cornell Career Fair Days - All Industries", date: "2026-03-09", location: "Barton Hall, Ithaca, NY", source: "https://career.cornell.edu/resources/career-fairs/" },
+      { college: "Cornell", name: "Cornell Career Fair Days - Real Estate & Hospitality", date: "2026-03-10", location: "Barton Hall, Ithaca, NY", source: "https://career.cornell.edu/resources/career-fairs/" },
+      { college: "Cornell", name: "AAP (Architecture/Art/Planning) Spring Career Fair", date: "2026-03-07", location: "Milstein Hall Dome", source: "https://aap.cornell.edu/events/function/career-fair-days-spring-2026/" },
+      { college: "San Jose State", name: "Fall Part-Time & On-Campus Job Fair", date: "2026-08-19", location: "Student Union Ballroom", source: "https://careercenter.sjsu.edu/events/" },
+      { college: "San Jose State", name: "Fall STEM Undergrad Job/Internship Fair (Day 1)", date: "2026-09-09", location: "Student Union Ballroom", source: "https://careercenter.sjsu.edu/events/" },
+      { college: "San Jose State", name: "Late Spring Job & Internship Fair", date: "2026-04-14", location: "Student Union Ballroom", source: "https://careercenter.sjsu.edu/events/" },
+      { college: "Northeastern", name: "Spring Talent Connect Career Fair", date: "2026-02-11", location: "Boston, MA", source: "https://careers.northeastern.edu/group/career-fairs/" },
+      { college: "Northeastern", name: "Talent Connect (Business/CS day)", date: "2026-02-12", location: "Boston, MA", source: "https://careers.northeastern.edu/group/career-fairs/" },
+      { college: "Carnegie Mellon", name: "STEM Career Fair (In-Person)", date: "2026-09-15", location: "Weigand Gym / University Center", source: "https://www.cmu.edu/career/employers/stem-in-person.html" },
+      { college: "Carnegie Mellon", name: "STEAM Job & Internship Career Fair", date: "2026-02-12", location: "Weigand Gym", source: "https://the-tartan.org/2026/02/16/cmu-hosts-annual-steam-career-fair/" },
+      { college: "Rutgers", name: "Fall Career & Internship Mega Fair (Day 1)", date: "2026-09-15", location: "Jersey Mike's Arena, Piscataway", source: "https://careers.rutgers.edu/events/career-internship-fairs" },
+      { college: "Rutgers", name: "Fall Career & Internship Mega Fair (Day 3)", date: "2026-09-17", location: "Jersey Mike's Arena, Piscataway", source: "https://careers.rutgers.edu/events/career-internship-fairs" },
+      { college: "Rutgers", name: "Spring Career & Internship Fair", date: "2026-04-24", location: "Jersey Mike's Arena, Piscataway", source: "https://careers.rutgers.edu/events/career-internship-fairs" },
+      { college: "Washington", name: "Winter Job & Internship Fair", date: "2026-02-04", location: "Husky Union Building (HUB)", source: "https://careers.uw.edu/career-fairs/" },
+      { college: "Washington", name: "Summer Job & Internship Fair", date: "2026-06-25", location: "Mary Gates Hall Commons", source: "https://careers.uw.edu/events/2026/06/25/uw-seattle-2026-in-person-summer-job-internship-fair-info-for-students/" },
+      { college: "Washington", name: "Washington Educator Career Fair", date: "2026-04-15", location: "Seattle, WA", source: "https://careers.uw.edu/blog/2026/03/25/2026-washington-educator-career-fair-april-15/" },
+      { college: "UIUC", name: "Grainger Engineering Fall Career Fair", date: "2026-09-09", location: "State Farm Center", source: "https://ecs.grainger.illinois.edu/employer-resources/career-fair" },
+      { college: "UIUC", name: "Gies College of Business Fall Career Fair", date: "2026-09-15", location: "1900 South First Street, Champaign", source: "https://www.careercenter.illinois.edu/career-events" },
+      { college: "UIUC", name: "CEE Fall Job Fair", date: "2026-09-15", location: "Illini Union", source: "https://cee.illinois.edu/student-life/career-prep/job-fair-cee-students" },
+    ];
+
+    // Populated at load: fairKey -> fairs sorted ascending by date
+    let FAIRS_BY_COLLEGE = new Map();
+
+    // Attach next / most-recent / all fairs to each school, computed
+    // against TODAY. Called on load AND could be re-called if data refreshes.
+    function computeFairs() {
+      FAIRS_BY_COLLEGE = new Map();
+      ALL_FAIRS.forEach(f => {
+        if (!FAIRS_BY_COLLEGE.has(f.college)) FAIRS_BY_COLLEGE.set(f.college, []);
+        FAIRS_BY_COLLEGE.get(f.college).push(f);
+      });
+      FAIRS_BY_COLLEGE.forEach(list => list.sort((a, b) => a.date.localeCompare(b.date)));
+
+      SCHOOLS.forEach(s => {
+        const list = FAIRS_BY_COLLEGE.get(s.fairKey) || [];
+        const upcoming = list.filter(f => f.date >= TODAY_ISO);
+        const past = list.filter(f => f.date < TODAY_ISO);
+        s.allFairs = list;
+        s.nextFairObj = upcoming[0] || null;                 // soonest upcoming
+        s.lastFairObj = past.length ? past[past.length - 1] : null; // most recent past
+      });
+    }
 
     // ------------------------------------------------------------
     // State
     // ------------------------------------------------------------
     let query = "";
     let sortBy = "hires"; // "hires" | "recentFair" | "upcomingFair"
+    let ALL_FAIRS = FAIRS_FALLBACK; // replaced by career_fairs.json when available
 
     // Today as an ISO string (YYYY-MM-DD) for comparing fair dates
     const TODAY_ISO = new Date().toLocaleDateString("en-CA");
@@ -689,15 +838,18 @@
 
       list.sort((a, b) => {
         if (sortBy === "recentFair") {
-          // Most recent (past) career fair first
-          return b.lastFair.localeCompare(a.lastFair);
+          // Most recent (past) career fair first; schools with none sink down
+          const ad = a.lastFairObj && a.lastFairObj.date;
+          const bd = b.lastFairObj && b.lastFairObj.date;
+          if (!ad || !bd) return ad ? -1 : bd ? 1 : 0;
+          return bd.localeCompare(ad);
         }
         if (sortBy === "upcomingFair") {
-          // Soonest upcoming fair first; fairs already past sink to the bottom
-          const aUp = a.nextFair >= TODAY_ISO;
-          const bUp = b.nextFair >= TODAY_ISO;
-          if (aUp !== bUp) return aUp ? -1 : 1;
-          return a.nextFair.localeCompare(b.nextFair);
+          // Soonest upcoming fair first; schools with none sink to the bottom
+          const ad = a.nextFairObj && a.nextFairObj.date;
+          const bd = b.nextFairObj && b.nextFairObj.date;
+          if (!ad || !bd) return ad ? -1 : bd ? 1 : 0;
+          return ad.localeCompare(bd);
         }
         return b.hires - a.hires; // most hires first
       });
@@ -720,11 +872,16 @@
         btn.type = "button";
         btn.className = "row";
         btn.setAttribute("role", "row");
-        const showUpcoming = sortBy === "upcomingFair";
+        // Default view highlights the NEXT (upcoming) fair; the
+        // "recent" sort flips it to show the most recent past fair.
+        const showUpcoming = sortBy !== "recentFair";
+        const fairObj = showUpcoming ? s.nextFairObj : s.lastFairObj;
         const fairLabel = showUpcoming ? "Next fair" : "Last fair";
-        const fairDate = formatFair(showUpcoming ? s.nextFair : s.lastFair);
+        const fairText = fairObj
+          ? `${fairLabel} · ${formatFair(fairObj.date)}`
+          : `No ${showUpcoming ? "upcoming" : "past"} fair listed`;
         btn.setAttribute("aria-label",
-          `${s.name}, ${TIER_LABEL[s.tier]}, ${s.hires} hires, ${fairLabel.toLowerCase()} ${fairDate}`);
+          `${s.name}, ${TIER_LABEL[s.tier]}, ${s.hires} hires, ${fairText}`);
         btn.innerHTML = `
           <span class="row__name-wrap">
             <span class="row__name">${s.name}</span>
@@ -732,7 +889,7 @@
           </span>
           <span class="row__hires">
             <span class="row__hires-count">${s.hires} hire${s.hires === 1 ? "" : "s"}</span>
-            <span class="row__fair">${fairLabel} · ${fairDate}</span>
+            <span class="row__fair">${fairText}</span>
           </span>
           ${chevron()}
         `;
@@ -759,11 +916,45 @@
       document.getElementById("modalTier").textContent = TIER_LABEL[s.tier];
       document.getElementById("modalHires").textContent =
         `${s.hires} hire${s.hires === 1 ? "" : "s"}`;
-      document.getElementById("modalFair").textContent =
-        `Next fair ${formatFair(s.nextFair)}`;
+      document.getElementById("modalFair").textContent = s.nextFairObj
+        ? `Next fair ${formatFair(s.nextFairObj.date)}`
+        : "No upcoming fair listed";
       document.getElementById("modalId").textContent = s.id;
+      renderModalFairs(s);
       overlay.classList.add("open");
       document.getElementById("modalClose").focus();
+    }
+
+    function renderModalFairs(s) {
+      const wrap = document.getElementById("modalFairs");
+      if (!s.allFairs || !s.allFairs.length) {
+        wrap.innerHTML = `<p class="modal__fairs-empty">No career fairs on file for this school yet.</p>`;
+        return;
+      }
+      const nextDate = s.nextFairObj && s.nextFairObj.date;
+      // Show soonest first: upcoming ascending, then past descending
+      const upcoming = s.allFairs.filter(f => f.date >= TODAY_ISO);
+      const past = s.allFairs.filter(f => f.date < TODAY_ISO).reverse();
+      const ordered = [...upcoming, ...past];
+      wrap.innerHTML = `
+        <div class="modal__fairs-head">Career fairs (${upcoming.length} upcoming)</div>
+        <ul class="fair-list">
+          ${ordered.map(f => {
+            const isNext = f.date === nextDate;
+            const isPast = f.date < TODAY_ISO;
+            return `
+              <li class="fair-item${isPast ? " fair-item--past" : ""}">
+                <div class="fair-item__main">
+                  <span class="fair-item__date">${formatFair(f.date)}</span>
+                  ${isNext ? `<span class="fair-item__badge">Next</span>` : ""}
+                  ${isPast ? `<span class="fair-item__badge fair-item__badge--past">Past</span>` : ""}
+                </div>
+                <div class="fair-item__name">${f.name}</div>
+                <div class="fair-item__loc">${f.location}</div>
+                <a class="fair-item__src" href="${f.source}" target="_blank" rel="noopener">Source ↗</a>
+              </li>`;
+          }).join("")}
+        </ul>`;
     }
 
     function closeDetail() {
@@ -827,7 +1018,34 @@
       });
     });
 
-    render();
+    // ------------------------------------------------------------
+    // Load the fair feed, then compute + render.
+    // ------------------------------------------------------------
+    // Order of preference:
+    //   1) career_fairs.json (the source of truth a scraper keeps fresh)
+    //   2) FAIRS_FALLBACK embedded above (used when fetch is blocked,
+    //      e.g. opening the file directly via file://)
+    // Because next/most-recent fairs are recomputed against today's date
+    // on every load, the "next career fair" rolls forward automatically
+    // as fairs pass — no manual edits needed.
+    async function init() {
+      try {
+        const res = await fetch("career_fairs.json", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.fairs) && data.fairs.length) {
+            ALL_FAIRS = data.fairs;
+          }
+        }
+      } catch (e) {
+        // fetch blocked (file://) or file missing — keep FAIRS_FALLBACK
+        console.info("Using embedded fair data (career_fairs.json not loaded):", e.message);
+      }
+      computeFairs();
+      render();
+    }
+
+    init();
   </script>
 </body>
 </html>
