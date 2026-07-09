@@ -210,20 +210,13 @@ TEMPLATE = r"""<!DOCTYPE html>
         <span class="header__divider" aria-hidden="true"></span>
         <span class="header__label">Campus Recruiting</span>
       </div>
-      <button class="icon-btn" type="button" aria-label="Dashboard" title="Dashboard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/>
-        </svg>
-      </button>
     </header>
 
     <section class="intro">
       <h1>Campus Recruiting Directory</h1>
-      <p>Schools Valon can source campus talent from — every college we've hired
-         from, plus top national universities and New York State institutions.
-         Click a school to see who we hired there, how to reach them, and its
-         upcoming general & tech/STEM career fairs.</p>
+      <p>Every school Valon has hired from, plus top-100 national universities and
+         4-year colleges in New York and San Francisco, with upcoming career fairs.
+         Click a school to see who we hired there and how to reach them.</p>
     </section>
 
     <div class="controls">
