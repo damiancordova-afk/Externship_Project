@@ -1,0 +1,61 @@
+{
+  "note": "Source-verified career-fair dates. This file is the single source of truth for the directory. A scheduled scraper can overwrite it (see scripts/refresh_fairs.md); the directory reads it on load and recomputes each school's next/most-recent fair against the current date.",
+  "fairs": [
+    { "college": "Stanford", "name": "Spring On-Campus Career Fair", "date": "2026-04-21", "location": "McCaw Hall, Stanford Alumni Center", "source": "https://careered.stanford.edu/events" },
+    { "college": "Stanford", "name": "Winter Career Fair", "date": "2026-01-22", "location": "Li Ka Shing Center, Berg Hall", "source": "https://forum.stanford.edu/events/career-fair" },
+
+    { "college": "MIT", "name": "Fall Career Fair (FCF)", "date": "2026-09-25", "location": "Johnson Athletic Center", "source": "https://capd.mit.edu/channels/fall-career-fair/" },
+    { "college": "MIT", "name": "Spring Career Night", "date": "2026-02-26", "location": "Sala de Puerto Rico, Stratton Student Center", "source": "https://capd.mit.edu/spring-career-night-employer-information/" },
+    { "college": "MIT", "name": "EECS Career Fair", "date": "2026-09-24", "location": "TBD", "source": "https://www.eecs.mit.edu/eecs-events/2026-eecs-career-fair/" },
+
+    { "college": "UC Berkeley", "name": "Spring Career Fair: STEM", "date": "2026-01-27", "location": "Recreational Sports Facility, Field House", "source": "https://career.berkeley.edu/employers/recruit-at-cal/recruitment-events-and-career-fairs/" },
+    { "college": "UC Berkeley", "name": "Nonprofit, Environment & Public Service Fair", "date": "2026-03-10", "location": "Pauley Ballroom, MLK Student Union", "source": "https://career.berkeley.edu/employers/recruit-at-cal/recruitment-events-and-career-fairs/" },
+    { "college": "UC Berkeley", "name": "Just In Time Career Fair", "date": "2026-04-07", "location": "Pauley Ballroom, MLK Jr. Student Union", "source": "https://career.berkeley.edu/employers/recruit-at-cal/recruitment-events-and-career-fairs/" },
+
+    { "college": "Arizona State", "name": "Spring Undergraduate Career & Internship Fair", "date": "2026-02-24", "location": "Tempe, AZ", "source": "https://career.eoss.asu.edu/channels/career-internship-fairs/" },
+    { "college": "Arizona State", "name": "Startup Career Fair (Change the World)", "date": "2026-03-18", "location": "Mountain America Stadium", "source": "https://career.eoss.asu.edu/channels/career-internship-fairs/" },
+    { "college": "Arizona State", "name": "Summer 2026 Career Fair", "date": "2026-04-13", "location": "Student Pavilion, Senita Ballroom, Tempe", "source": "https://career.eoss.asu.edu/channels/career-internship-fairs/" },
+
+    { "college": "Michigan", "name": "Fall Job & Internship Fair (Day 1)", "date": "2026-09-09", "location": "Michigan Union", "source": "https://careercenter.umich.edu/content/job-and-internship-fairs" },
+    { "college": "Michigan", "name": "Fall Job & Internship Fair (Days 2-3)", "date": "2026-09-14", "location": "Michigan Union", "source": "https://careercenter.umich.edu/content/job-and-internship-fairs" },
+    { "college": "Michigan", "name": "Engineering Career Fair", "date": "2026-02-06", "location": "Duderstadt Center / Engin. Career Resource Ctr", "source": "https://career.engin.umich.edu/career-fairs-employers/" },
+
+    { "college": "UT Austin", "name": "Fall Engineering Expo", "date": "2026-09-09", "location": "Rec Sports Center", "source": "https://cockrell.utexas.edu/student-life/career-services/career-fairs/" },
+    { "college": "UT Austin", "name": "Liberal Arts Career Fair", "date": "2026-02-25", "location": "Texas Union Ballroom", "source": "https://liberalarts.utexas.edu/career-services/employers/fairs/" },
+    { "college": "UT Austin", "name": "UTSOA (Architecture) Career Fair", "date": "2026-02-06", "location": "AT&T Hotel and Conference Center", "source": "https://soa.utexas.edu/events/utsoa-career-fair" },
+
+    { "college": "Purdue", "name": "Industrial Roundtable (In-Person)", "date": "2026-09-15", "location": "France A. Córdova Recreational Sports Center", "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs" },
+    { "college": "Purdue", "name": "Daniels School of Business Fall Career Fair", "date": "2026-09-17", "location": "West Lafayette, IN", "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs" },
+    { "college": "Purdue", "name": "Polytechnic Career Fair", "date": "2026-02-04", "location": "Purdue Memorial Union", "source": "https://polytechnic.purdue.edu/events/purdue-polytechnic-career-fair" },
+
+    { "college": "Georgia Tech", "name": "All-Majors Career Fair (Fall)", "date": "2026-09-14", "location": "Campus Recreation Center (CRC)", "source": "https://careerfair.gatech.edu/upcoming-career-fairs/" },
+    { "college": "Georgia Tech", "name": "College of Computing (CoC) Career Fair", "date": "2026-09-17", "location": "McCamish Pavilion", "source": "https://careerfair.gatech.edu/upcoming-career-fairs/" },
+    { "college": "Georgia Tech", "name": "ECE Career Fair", "date": "2026-09-18", "location": "McCamish Pavilion", "source": "https://ece.gatech.edu/careerfair" },
+
+    { "college": "Cornell", "name": "Cornell Career Fair Days - All Industries", "date": "2026-03-09", "location": "Barton Hall, Ithaca, NY", "source": "https://career.cornell.edu/resources/career-fairs/" },
+    { "college": "Cornell", "name": "Cornell Career Fair Days - Real Estate & Hospitality", "date": "2026-03-10", "location": "Barton Hall, Ithaca, NY", "source": "https://career.cornell.edu/resources/career-fairs/" },
+    { "college": "Cornell", "name": "AAP (Architecture/Art/Planning) Spring Career Fair", "date": "2026-03-07", "location": "Milstein Hall Dome", "source": "https://aap.cornell.edu/events/function/career-fair-days-spring-2026/" },
+
+    { "college": "San Jose State", "name": "Fall Part-Time & On-Campus Job Fair", "date": "2026-08-19", "location": "Student Union Ballroom", "source": "https://careercenter.sjsu.edu/events/" },
+    { "college": "San Jose State", "name": "Fall STEM Undergrad Job/Internship Fair (Day 1)", "date": "2026-09-09", "location": "Student Union Ballroom", "source": "https://careercenter.sjsu.edu/events/" },
+    { "college": "San Jose State", "name": "Late Spring Job & Internship Fair", "date": "2026-04-14", "location": "Student Union Ballroom", "source": "https://careercenter.sjsu.edu/events/" },
+
+    { "college": "Northeastern", "name": "Spring Talent Connect Career Fair", "date": "2026-02-11", "location": "Boston, MA", "source": "https://careers.northeastern.edu/group/career-fairs/" },
+    { "college": "Northeastern", "name": "Talent Connect (Business/CS day)", "date": "2026-02-12", "location": "Boston, MA", "source": "https://careers.northeastern.edu/group/career-fairs/" },
+
+    { "college": "Carnegie Mellon", "name": "STEM Career Fair (In-Person)", "date": "2026-09-15", "location": "Weigand Gym / University Center", "source": "https://www.cmu.edu/career/employers/stem-in-person.html" },
+    { "college": "Carnegie Mellon", "name": "STEAM Job & Internship Career Fair", "date": "2026-02-12", "location": "Weigand Gym", "source": "https://the-tartan.org/2026/02/16/cmu-hosts-annual-steam-career-fair/" },
+
+    { "college": "Rutgers", "name": "Fall Career & Internship Mega Fair (Day 1)", "date": "2026-09-15", "location": "Jersey Mike's Arena, Piscataway", "source": "https://careers.rutgers.edu/events/career-internship-fairs" },
+    { "college": "Rutgers", "name": "Fall Career & Internship Mega Fair (Day 3)", "date": "2026-09-17", "location": "Jersey Mike's Arena, Piscataway", "source": "https://careers.rutgers.edu/events/career-internship-fairs" },
+    { "college": "Rutgers", "name": "Spring Career & Internship Fair", "date": "2026-04-24", "location": "Jersey Mike's Arena, Piscataway", "source": "https://careers.rutgers.edu/events/career-internship-fairs" },
+
+    { "college": "Washington", "name": "Winter Job & Internship Fair", "date": "2026-02-04", "location": "Husky Union Building (HUB)", "source": "https://careers.uw.edu/career-fairs/" },
+    { "college": "Washington", "name": "Summer Job & Internship Fair", "date": "2026-06-25", "location": "Mary Gates Hall Commons", "source": "https://careers.uw.edu/events/2026/06/25/uw-seattle-2026-in-person-summer-job-internship-fair-info-for-students/" },
+    { "college": "Washington", "name": "Washington Educator Career Fair", "date": "2026-04-15", "location": "Seattle, WA", "source": "https://careers.uw.edu/blog/2026/03/25/2026-washington-educator-career-fair-april-15/" },
+
+    { "college": "UIUC", "name": "Grainger Engineering Fall Career Fair", "date": "2026-09-09", "location": "State Farm Center", "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair" },
+    { "college": "UIUC", "name": "Gies College of Business Fall Career Fair", "date": "2026-09-15", "location": "1900 South First Street, Champaign", "source": "https://www.careercenter.illinois.edu/career-events" },
+    { "college": "UIUC", "name": "CEE Fall Job Fair", "date": "2026-09-15", "location": "Illini Union", "source": "https://cee.illinois.edu/student-life/career-prep/job-fair-cee-students" }
+  ]
+}
