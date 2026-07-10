@@ -14,12 +14,14 @@ Design notes / honest limits
   appended only when (college, date) is not already present, so a bad scrape can
   add noise but can't wipe curated data — review the diff the Action commits.
 * Only UPCOMING fairs (date >= today) are added; the feed is forward-looking.
-* The default extractor is GENERIC: it looks for date strings that appear near
-  career-fair keywords, and skips obviously niche fairs (nursing, accounting,
-  MBA-only, etc.) to match the directory's general + tech/STEM scope. It will
-  still miss JavaScript-rendered pages (many Handshake / Symplicity calendars)
-  and won't always produce clean fair *names*. For good results, add a
-  site-specific function to EXTRACTORS below.
+* The default extractor is GENERIC and multi-strategy: it reads Localist JSON
+  APIs, schema.org JSON-LD Events, and embedded __NEXT_DATA__/state JSON before
+  falling back to scraping rendered text — so it now recovers many pages that
+  merely *look* JavaScript-rendered (the data is in the HTML payload). It still
+  skips obviously niche fairs (nursing, accounting, MBA-only, etc.). What it
+  genuinely can't reach: pages whose dates live only behind a login
+  (Handshake / Symplicity / 12twenty) — those stay in MANUAL_COLLEGES or as
+  curated rows.
 * Auto-added rows are tagged {"auto": true, "scraped_at": "<date>"} so you can
   tell them apart from curated rows and prune them if needed.
 
@@ -56,19 +58,28 @@ TODAY = dt.date.today()
 MIN_DATE = TODAY - dt.timedelta(days=365)
 MAX_DATE = TODAY + dt.timedelta(days=730)
 
-KEYWORDS = re.compile(
+# A block/title must contain one of these fair-title phrases to count. It is
+# deliberately strict (a bare "recruit"/"stem" is not enough): structured passes
+# enumerate EVERY event on a calendar, and the text pass would otherwise grab
+# registration boilerplate ("Register Now", "Payment ...") that merely sits near
+# a date. Named non-"fair" events we still want are listed explicitly.
+FAIR_TITLE = re.compile(
     r"career fair|career expo|job fair|internship fair|job & internship|"
-    r"recruit|talent connect|industrial roundtable|career night|career day|"
-    r"hiring expo|engineering expo|tech fair|stem",
+    r"job and internship|career & internship|career and internship|hiring expo|"
+    r"engineering expo|recruiting expo|career (day|night|fest)|"
+    r"industrial roundtable|talent connect|opportunities (conference|fair)|"
+    r"(tech|stem|engineering|all[- ]?majors) (fair|expo)",
     re.I,
 )
 
 # Skip obviously niche fairs so the feed stays scoped to general + tech/STEM,
 # matching the curated directory. A block matching any of these is dropped.
 NEGATIVE = re.compile(
-    r"\b(nursing|accounting|cpa|mba|business school|law school|pre-?law|"
-    r"education|teacher|educator|hospitality|supply chain|doctoral|postdoc|"
-    r"graduate school fair|health(care)? professions|pharmacy|dental|nurse)\b",
+    r"\b(nursing|accounting|cpa|mba|business school|school of business|"
+    r"business career|law school|pre-?law|education|teacher|educator|"
+    r"hospitality|supply chain|doctoral|postdoc|dissertation|"
+    r"graduate school fair|health(care)? professions|pharmacy|dental|nurse|"
+    r"real estate)\b",
     re.I,
 )
 
@@ -128,17 +139,182 @@ def find_dates(text: str) -> list[str]:
 
 # ----------------------------------------------------------------------------
 # Extractors
+#
+# generic_extractor runs four passes and merges them (one row per date, richest
+# name wins). Order matters — structured data is far more reliable than scraping
+# rendered text, so it comes first:
+#   1. Localist  — many .edu event calendars expose a public JSON API at
+#                  <host>/api/2/events; no browser needed.
+#   2. JSON-LD   — schema.org "Event" objects embedded in <script type=ld+json>.
+#   3. __NEXT_DATA__ / inline JSON — Next.js and similar SPAs ship their event
+#                  data as JSON in the initial HTML even when the DOM is empty.
+#   4. Text pass — the original heuristic (keyword + nearby date in a block).
+# Passes 1-3 recover most pages that "look" JavaScript-rendered, because the data
+# is in the HTML payload even if the visible DOM is built client-side.
 # ----------------------------------------------------------------------------
-def generic_extractor(html: str, college: str, url: str) -> list[dict]:
-    """
-    Conservative default: split the page into blocks, and for any block that
-    mentions a career-fair keyword AND contains a date, emit a row. Fair name is
-    a best-effort trim of the block text.
-    """
+def _iso_from(value) -> str | None:
+    """Normalize a date/datetime string to a windowed YYYY-MM-DD, or None."""
+    if not value:
+        return None
+    s = str(value)
+    m = re.match(r"\s*(\d{4})-(\d{2})-(\d{2})", s)
+    if m:
+        return _mk(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    found = find_dates(s)
+    return found[0] if found else None
+
+
+def _fair_row(college: str, url: str, name, date, location="") -> dict | None:
+    """Build+validate a fair row from structured fields. The NAME must look like a
+    career fair (and not a niche one); the date must be in the sane window."""
+    name = (name or "")
+    name = name if isinstance(name, str) else str(name)
+    name = " ".join(name.split())
+    if not name or not FAIR_TITLE.search(name) or NEGATIVE.search(name):
+        return None
+    iso = _iso_from(date)
+    if not iso:
+        return None
+    loc = location if isinstance(location, str) else ""
+    return {"college": college, "name": name[:120], "date": iso,
+            "location": " ".join(loc.split())[:160], "source": url}
+
+
+def _walk(obj):
+    """Yield every dict nested anywhere inside a JSON structure."""
+    if isinstance(obj, dict):
+        yield obj
+        for v in obj.values():
+            yield from _walk(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _walk(v)
+
+
+def _jsonld_location(loc) -> str:
+    if isinstance(loc, str):
+        return loc
+    if isinstance(loc, list) and loc:
+        return _jsonld_location(loc[0])
+    if isinstance(loc, dict):
+        if isinstance(loc.get("name"), str):
+            return loc["name"]
+        addr = loc.get("address")
+        if isinstance(addr, str):
+            return addr
+        if isinstance(addr, dict):
+            return addr.get("addressLocality") or addr.get("streetAddress") or ""
+    return ""
+
+
+def parse_jsonld(html: str, college: str, url: str) -> list[dict]:
+    """schema.org Event objects in <script type='application/ld+json'>."""
+    rows: list[dict] = []
+    for m in re.finditer(
+            r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+            html, re.I | re.S):
+        try:
+            data = json.loads(m.group(1).strip())
+        except Exception:  # noqa: BLE001 — malformed/multi-object blocks: skip
+            continue
+        for d in _walk(data):
+            t = d.get("@type", "")
+            types = t if isinstance(t, list) else [t]
+            if not any("event" in str(x).lower() for x in types):
+                continue
+            r = _fair_row(college, url,
+                          d.get("name") or d.get("headline"),
+                          d.get("startDate") or d.get("startdate"),
+                          _jsonld_location(d.get("location")))
+            if r:
+                rows.append(r)
+    return rows
+
+
+def parse_embedded_json(html: str, college: str, url: str) -> list[dict]:
+    """Event data shipped as JSON in the initial HTML (Next.js __NEXT_DATA__,
+    Nuxt, Redux state dumps, etc.). We walk every embedded blob for dict shapes
+    that look like an event (a title-ish field + a start-date-ish field)."""
+    rows: list[dict] = []
+    blobs = re.findall(
+        r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>', html, re.I | re.S)
+    blobs += re.findall(
+        r'<script[^>]*>\s*(?:window\.)?__(?:NUXT|APOLLO_STATE|INITIAL_STATE)__\s*=\s*({.*?})\s*;?\s*</script>',
+        html, re.I | re.S)
+    NAME_KEYS = ("name", "title", "eventName", "event_name")
+    DATE_KEYS = ("startDate", "start_date", "starts_at", "startsAt", "start", "date",
+                 "first_date", "beginDate")
+    LOC_KEYS = ("location", "locationName", "location_name", "venue", "place", "room")
+    for blob in blobs:
+        try:
+            data = json.loads(blob.strip())
+        except Exception:  # noqa: BLE001
+            continue
+        for d in _walk(data):
+            name = next((d[k] for k in NAME_KEYS if isinstance(d.get(k), str)), None)
+            date = next((d[k] for k in DATE_KEYS if d.get(k)), None)
+            if not name or not date:
+                continue
+            loc = ""
+            for lk in LOC_KEYS:
+                v = d.get(lk)
+                if isinstance(v, str):
+                    loc = v
+                    break
+                if isinstance(v, dict) and isinstance(v.get("name"), str):
+                    loc = v["name"]
+                    break
+            r = _fair_row(college, url, name, date, loc)
+            if r:
+                rows.append(r)
+    return rows
+
+
+def parse_localist(html: str, college: str, url: str) -> list[dict]:
+    """If the page is a Localist calendar, hit its public JSON API directly.
+    Detected by the Localist signature in the HTML; the API lives at
+    <same-host>/api/2/events."""
+    if not re.search(r"platform-controller|localist|/api/2/events", html, re.I):
+        return []
+    from urllib.parse import urlparse
+    host = urlparse(url).netloc
+    if not host:
+        return []
+    # Localist API v2: `days`+`pp` is the documented form (combining `days` with
+    # `start` 400s). 365 days from today covers the whole upcoming fall/spring.
+    api = f"https://{host}/api/2/events?days=365&pp=100"
+    body = fetch(api)
+    if not body:
+        return []
+    try:
+        data = json.loads(body)
+    except Exception:  # noqa: BLE001
+        return []
+    rows: list[dict] = []
+    for wrap in data.get("events", []):
+        ev = wrap.get("event", wrap) if isinstance(wrap, dict) else {}
+        if not isinstance(ev, dict):
+            continue
+        date = ev.get("first_date")
+        if not date:
+            insts = ev.get("event_instances") or []
+            if insts and isinstance(insts[0], dict):
+                inst = insts[0].get("event_instance", insts[0])
+                date = inst.get("start") if isinstance(inst, dict) else None
+        r = _fair_row(college, url, ev.get("title") or ev.get("name"), date,
+                      ev.get("location_name") or ev.get("location") or "")
+        if r:
+            rows.append(r)
+    return rows
+
+
+def _text_block_extractor(html: str, college: str, url: str) -> list[dict]:
+    """Original heuristic: any DOM block that mentions a career-fair keyword AND
+    contains a date. Fair name is a best-effort trim of the block text."""
     try:
         from bs4 import BeautifulSoup  # type: ignore
     except ImportError:
-        print("  ! beautifulsoup4 not installed; skipping generic parse", file=sys.stderr)
+        print("  ! beautifulsoup4 not installed; skipping text parse", file=sys.stderr)
         return []
 
     soup = BeautifulSoup(html, "html.parser")
@@ -147,39 +323,66 @@ def generic_extractor(html: str, college: str, url: str) -> list[dict]:
 
     rows: list[dict] = []
     seen: set[str] = set()
-    # Candidate blocks: list items, table rows, headings, paragraphs, cards.
-    for el in soup.find_all(["li", "tr", "article", "section", "h2", "h3", "p", "div"]):
+    for el in soup.find_all(["li", "tr", "article", "section", "h2", "h3", "p", "div", "time"]):
         block = " ".join(el.get_text(" ", strip=True).split())
-        if not block or len(block) > 400:
+        if not block or len(block) > 600:      # loosened from 400
             continue
-        if not KEYWORDS.search(block):
-            continue
-        if NEGATIVE.search(block):     # niche fair — out of scope
+        # Require the STRICT fair-title phrase in the block (not just a loose
+        # keyword) — this is what kept "Register Now" / "Payment ..." junk out.
+        m = FAIR_TITLE.search(block)
+        if not m or NEGATIVE.search(block):
             continue
         dates = find_dates(block)
         if not dates:
             continue
-        # Name: text up to the first date-ish token, trimmed.
+        # Name: text before the first date; if that isn't a fair title, fall back
+        # to a window starting at the matched fair phrase.
         name = re.split(r"\b[A-Za-z]{3,9}\.?\s+\d{1,2}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{2,4}",
                         block)[0].strip(" -–—:·|")
-        name = (name[:80] or "Career fair").strip()
+        if not FAIR_TITLE.search(name):
+            name = block[m.start():m.start() + 70].strip(" -–—:·|")
+        name = (name[:80] or m.group(0)).strip()
         for iso in dates:
             if iso in seen:
                 continue
             seen.add(iso)
-            rows.append({
-                "college": college,
-                "name": name or "Career fair",
-                "date": iso,
-                "location": "",
-                "source": url,
-            })
+            rows.append({"college": college, "name": name or m.group(0),
+                         "date": iso, "location": "", "source": url})
     return rows
 
 
+def _name_rank(row: dict) -> int:
+    """Prefer informative names when two passes find the same date."""
+    n = row.get("name", "")
+    rank = len(n)
+    if n.lower() in ("career fair", "career expo", "job fair", ""):
+        rank -= 100
+    if row.get("location"):
+        rank += 20
+    return rank
+
+
+def generic_extractor(html: str, college: str, url: str) -> list[dict]:
+    """Run all strategies and merge: one row per date, richest name wins."""
+    rows: list[dict] = []
+    for strategy in (parse_localist, parse_jsonld, parse_embedded_json,
+                     _text_block_extractor):
+        try:
+            rows.extend(strategy(html, college, url))
+        except Exception as e:  # noqa: BLE001 — one bad parser shouldn't kill the page
+            print(f"  ! {strategy.__name__} failed for {college}: {e}", file=sys.stderr)
+    best: dict[str, dict] = {}
+    for r in rows:
+        k = r["date"]
+        if k not in best or _name_rank(r) > _name_rank(best[k]):
+            best[k] = r
+    return list(best.values())
+
+
 # Site-specific extractors go here, keyed by college. Signature matches
-# generic_extractor(html, college, url) -> list[dict]. Fill these in as pages
-# prove too dynamic/irregular for the generic pass.
+# generic_extractor(html, college, url) -> list[dict]. The generic pass now
+# handles Localist / JSON-LD / embedded-JSON automatically, so most sites no
+# longer need one; add here only for pages too irregular for all four passes.
 EXTRACTORS: dict[str, callable] = {
     # "MIT": mit_extractor,
 }
@@ -204,8 +407,17 @@ def fetch(url: str, timeout: int = 20) -> str | None:
     except ImportError:
         print("  ! requests not installed; cannot fetch", file=sys.stderr)
         return None
+    # Browser-like headers get past some WAFs/CDNs that 403 a bare bot UA. We
+    # still identify ourselves in a comment-style suffix for server logs.
+    headers = {
+        "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 "
+                       f"Safari/537.36 ({USER_AGENT})"),
+        "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
     try:
-        r = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=timeout)
+        r = requests.get(url, headers=headers, timeout=timeout)
         r.raise_for_status()
         return r.text
     except Exception as e:  # noqa: BLE001 — one bad site shouldn't kill the run
