@@ -265,6 +265,48 @@ except FileNotFoundError:
     pass
 
 
+def _contact_sig(c):
+    """Signature for de-duping a contact; phone compared by digits only so
+    '623-853-6555' and '6238536555' match."""
+    v = str(c.get("value", "")).strip().lower()
+    if c.get("kind") == "phone":
+        return "phone:" + re.sub(r"\D", "", v)
+    return f"{c.get('kind', '')}:{v}"
+
+
+def _dedupe_hires(hires):
+    """Collapse duplicate candidate records for the SAME person at one school:
+    matched on same name AND a shared email or phone (ignoring formatting).
+    Contacts are unioned so no info is lost. Two different people who happen to
+    share a name but no contact stay separate."""
+    buckets = []   # {"key": name_key, "sigs": set, "hire": {...}}
+    for h in hires:
+        key = _name_key(h["name"]) if h.get("name") else None
+        sigs = {_contact_sig(c) for c in h.get("contacts", [])
+                if c.get("kind") in ("email", "phone")}
+        target = None
+        if key:
+            for b in buckets:
+                if b["key"] == key and (sigs & b["sigs"]):
+                    target = b
+                    break
+        if target is None:
+            buckets.append({"key": key, "sigs": set(sigs),
+                            "hire": {"name": h.get("name"),
+                                     "current": bool(h.get("current")),
+                                     "contacts": list(h.get("contacts", []))}})
+        else:
+            target["sigs"] |= sigs
+            target["hire"]["current"] = target["hire"]["current"] or bool(h.get("current"))
+            have = {_contact_sig(c) for c in target["hire"]["contacts"]}
+            for c in h.get("contacts", []):
+                s = _contact_sig(c)
+                if s not in have:
+                    have.add(s)
+                    target["hire"]["contacts"].append(c)
+    return [b["hire"] for b in buckets]
+
+
 def parse(v):
     if pd.isna(v):
         return None
@@ -488,12 +530,13 @@ def main():
             criteria.append("fair")
         if rec["hires"]:
             criteria.append("hired")
+        deduped = _dedupe_hires(rec["hires"])   # collapse duplicate candidate records
         out.append({
             "name": display,
-            "count": len(rec["person_ids"]),
+            "count": len(deduped),               # distinct PEOPLE, not raw records
             "criteria": criteria,
             "fairs": fairs,
-            "hires": sorted(rec["hires"], key=lambda h: (h["name"] or "").lower()),
+            "hires": sorted(deduped, key=lambda h: (h["name"] or "").lower()),
         })
 
     out.sort(key=lambda s: (-s["count"], s["name"].lower()))
