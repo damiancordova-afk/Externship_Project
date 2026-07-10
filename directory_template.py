@@ -213,6 +213,19 @@ TEMPLATE = r"""<!DOCTYPE html>
     .contact__label { color:var(--text-label); text-transform:uppercase; font-size:11px; letter-spacing:0.4px; }
     .contact__value { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px; }
     .contact--mono { font-family:var(--font-mono); }
+    button.contact { cursor:pointer; }
+
+    /* Email template picker */
+    .email-menu { background:var(--white); border:1px solid var(--border-soft);
+      border-radius:var(--radius-card); box-shadow:var(--shadow-menu); padding:6px;
+      z-index:60; width:280px; max-width:92vw; }
+    .email-menu__title { font-size:11px; text-transform:uppercase; letter-spacing:0.4px;
+      color:var(--text-label); padding:6px 10px 8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .email-menu__item { display:block; width:100%; text-align:left; border:none; background:none;
+      font-family:var(--font-sans); font-size:14px; color:var(--text-body); padding:9px 10px;
+      border-radius:8px; cursor:pointer; }
+    .email-menu__item:hover { background:var(--row-hover); }
+    .email-menu__item small { display:block; color:var(--text-label); font-size:12px; margin-top:1px; }
     .hire__none { font-size:13px; color:var(--text-secondary); font-style:italic; }
     .modal__emptystate { padding:32px 0; text-align:center; color:var(--text-secondary); font-size:14px; }
 
@@ -603,11 +616,74 @@ TEMPLATE = r"""<!DOCTYPE html>
     const modalMeta = document.getElementById("modalMeta");
     let lastFocused = null;
 
-    function contactChip(c) {
+    // ---- Email template picker ----
+    function buildMailto(email, subject, body) {
+      let u = "mailto:" + email;
+      const parts = [];
+      if (subject) parts.push("subject=" + encodeURIComponent(subject));
+      if (body) parts.push("body=" + encodeURIComponent(body.replace(/\n/g, "\r\n")));
+      return parts.length ? u + "?" + parts.join("&") : u;
+    }
+    function emailTemplates(ctx) {
+      const raw = (ctx.name || "").trim();
+      const fn = (raw && raw[0] !== "(") ? raw.split(/\s+/)[0] : "there";
+      const school = ctx.school || "your school";
+      return [
+        { label: "Invitation", hint: "Invite them to connect",
+          subject: "Connecting with Valon",
+          body: `Hi ${fn},\n\nI'm on the campus recruiting team at Valon. Your background at ${school} stood out, and I'd love to invite you to connect — a quick call, a coffee chat, or to meet our team at an upcoming career fair.\n\nWould you be open to a short conversation over the next week or two?\n\nBest,\n[Your name]\nValon | Campus Recruiting` },
+        { label: "Inquiry about the institution", hint: "Ask about recruiting at their school",
+          subject: `Quick question about ${school}`,
+          body: `Hi ${fn},\n\nI'm reaching out from Valon's campus recruiting team. We're looking to grow our presence at ${school}, and since you know the community well, I'd value your perspective — which career fairs are worth attending, active student organizations, and how best to reach strong candidates there.\n\nWould you have 15 minutes to share your thoughts?\n\nBest,\n[Your name]\nValon | Campus Recruiting` },
+        { label: "Other", hint: "Blank email — write your own",
+          subject: "", body: "" },
+      ];
+    }
+    let emailMenuEl = null;
+    function closeEmailMenu() {
+      if (emailMenuEl) { emailMenuEl.remove(); emailMenuEl = null; }
+      document.removeEventListener("click", onDocClickEmail, true);
+    }
+    function onDocClickEmail(e) { if (emailMenuEl && !emailMenuEl.contains(e.target)) closeEmailMenu(); }
+    function openEmailMenu(anchor, c, ctx) {
+      closeEmailMenu();
+      const menu = document.createElement("div"); menu.className = "email-menu";
+      const t = document.createElement("div"); t.className = "email-menu__title";
+      t.textContent = "Email " + c.value; menu.appendChild(t);
+      emailTemplates(ctx || {}).forEach(tpl => {
+        const b = document.createElement("button"); b.type = "button"; b.className = "email-menu__item";
+        b.textContent = tpl.label;
+        const s = document.createElement("small"); s.textContent = tpl.hint; b.appendChild(s);
+        b.addEventListener("click", () => {
+          window.location.href = buildMailto(c.value, tpl.subject, tpl.body);
+          closeEmailMenu();
+        });
+        menu.appendChild(b);
+      });
+      document.body.appendChild(menu);
+      const r = anchor.getBoundingClientRect();
+      menu.style.position = "fixed";
+      menu.style.top = Math.min(r.bottom + 6, window.innerHeight - menu.offsetHeight - 10) + "px";
+      menu.style.left = Math.min(r.left, window.innerWidth - menu.offsetWidth - 10) + "px";
+      emailMenuEl = menu;
+      setTimeout(() => document.addEventListener("click", onDocClickEmail, true), 0);
+    }
+
+    function contactChip(c, ctx) {
+      if (c.kind === "email") {
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "contact contact--mono";
+        const lab = document.createElement("span");
+        lab.className = "contact__label"; lab.textContent = c.label;
+        const val = document.createElement("span");
+        val.className = "contact__value"; val.textContent = c.value;
+        btn.appendChild(lab); btn.appendChild(val);
+        btn.addEventListener("click", (e) => { e.stopPropagation(); openEmailMenu(btn, c, ctx || {}); });
+        return btn;
+      }
       const a = document.createElement("a");
-      a.className = "contact" + (c.kind === "email" || c.kind === "phone" ? " contact--mono" : "");
-      a.href = c.href;
-      if (c.kind !== "email" && c.kind !== "phone") { a.target = "_blank"; a.rel = "noopener"; }
+      a.className = "contact";
+      a.href = c.href; a.target = "_blank"; a.rel = "noopener";
       const lab = document.createElement("span");
       lab.className = "contact__label"; lab.textContent = c.label;
       const val = document.createElement("span");
@@ -759,7 +835,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           row.appendChild(head);
           if (h.contacts.length) {
             const cc = document.createElement("div"); cc.className = "contacts";
-            h.contacts.forEach(c => cc.appendChild(contactChip(c)));
+            h.contacts.forEach(c => cc.appendChild(contactChip(c, { name: h.name, school: s.name })));
             row.appendChild(cc);
           } else {
             const none = document.createElement("div");
@@ -784,7 +860,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       overlay.classList.add("open");
       document.getElementById("modalClose").focus();
     }
-    function closeDetail() { overlay.classList.remove("open"); if (lastFocused) lastFocused.focus(); }
+    function closeDetail() { closeEmailMenu(); overlay.classList.remove("open"); if (lastFocused) lastFocused.focus(); }
 
     document.getElementById("modalClose").addEventListener("click", closeDetail);
     overlay.addEventListener("click", e => { if (e.target === overlay) closeDetail(); });
@@ -860,7 +936,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         card.appendChild(top);
         if (c.contacts && c.contacts.length) {
           const cc = document.createElement("div"); cc.className = "contacts"; cc.style.marginTop = "10px";
-          c.contacts.forEach(x => cc.appendChild(contactChip(x)));
+          c.contacts.forEach(x => cc.appendChild(contactChip(x, { name: c.name, school: c.school })));
           card.appendChild(cc);
         }
         const school = SCHOOLS.find(x => x.name === c.school);
@@ -890,6 +966,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     const tabDir = document.getElementById("tabDirectory");
     const tabSav = document.getElementById("tabSaved");
     function showTab(saved) {
+      closeEmailMenu();
       tabSav.setAttribute("aria-selected", String(saved));
       tabDir.setAttribute("aria-selected", String(!saved));
       savView.hidden = !saved; dirView.hidden = saved;
