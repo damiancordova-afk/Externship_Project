@@ -216,6 +216,60 @@ TEMPLATE = r"""<!DOCTYPE html>
     .hire__none { font-size:13px; color:var(--text-secondary); font-style:italic; }
     .modal__emptystate { padding:32px 0; text-align:center; color:var(--text-secondary); font-size:14px; }
 
+    /* Top tabs (Directory / Saved contacts) */
+    .tabs { display:flex; gap:4px; margin:0 0 24px; border-bottom:1px solid var(--divider); }
+    .tab { appearance:none; border:none; background:none; cursor:pointer;
+      font-family:var(--font-sans); font-size:15px; color:var(--text-secondary);
+      padding:10px 4px; margin-right:20px; border-bottom:2px solid transparent;
+      transition:color var(--ease),border-color var(--ease); display:inline-flex; align-items:center; gap:8px; }
+    .tab:hover { color:var(--ink); }
+    .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--ink); }
+    .tab__count { background:var(--n-200); color:var(--text-body); font-size:12px;
+      min-width:20px; height:20px; border-radius:10px; display:inline-grid; place-items:center; padding:0 6px; }
+
+    /* RSVP + Add-to-calendar (in the fair block) */
+    .fair__rsvp { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; font-size:13px; }
+    .fair__rsvp-q { color:var(--text-secondary); }
+    .rsvp-btn { appearance:none; font-family:var(--font-sans); font-size:13px; cursor:pointer;
+      border:1px solid var(--border-soft); background:var(--white); color:var(--text-body);
+      border-radius:999px; padding:4px 12px; transition:all var(--ease); }
+    .rsvp-btn:hover { border-color:var(--border-hover); }
+    .rsvp-btn[aria-pressed="true"][data-ans="yes"] { background:#3F7D5B; border-color:#3F7D5B; color:#fff; }
+    .rsvp-btn[aria-pressed="true"][data-ans="no"] { background:var(--n-500); border-color:var(--n-500); color:#fff; }
+    .gcal { display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none;
+      color:#2F6FB0; border:1px solid #2F6FB0; border-radius:var(--radius-input); padding:4px 10px;
+      transition:background var(--ease); }
+    .gcal:hover { background:rgba(47,111,176,0.08); }
+    .gcal svg { width:14px; height:14px; }
+
+    /* Save-contact button */
+    .hire__head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+    .hire__head .hire__name { margin-bottom:0; }
+    .save-btn { appearance:none; font-family:var(--font-sans); font-size:12px; cursor:pointer;
+      border:1px solid var(--border-soft); background:var(--white); color:var(--text-body);
+      border-radius:999px; padding:4px 10px; display:inline-flex; align-items:center; gap:6px;
+      white-space:nowrap; transition:all var(--ease); }
+    .save-btn:hover { border-color:var(--border-hover); }
+    .save-btn svg { width:14px; height:14px; }
+    .save-btn[aria-pressed="true"] { background:var(--gold-500); border-color:var(--gold-500); color:#fff; }
+
+    /* Saved-contacts view */
+    .saved-empty { padding:64px 24px; text-align:center; color:var(--text-secondary); font-size:15px; }
+    .saved-card { background:var(--white); border:1px solid var(--border-soft);
+      border-radius:var(--radius-card); padding:20px 24px; margin-bottom:16px; }
+    .saved-card__top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .saved-card__name { font-size:17px; }
+    .saved-card__school { font-size:13px; color:var(--text-secondary); margin-top:2px; }
+    .saved-card__fairs { margin-top:12px; font-size:13px; color:var(--text-body); }
+    .saved-card__fairs .fairs__title { margin:0 0 6px; }
+    .saved-card__fair { display:flex; gap:8px; padding:3px 0; color:var(--text-body); }
+    .saved-card__fair b { font-weight:400; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .saved-card__none { font-size:13px; color:var(--text-label); font-style:italic; margin-top:10px; }
+    .remove-btn { appearance:none; border:1px solid var(--border-soft); background:var(--white);
+      color:var(--text-secondary); border-radius:var(--radius-input); font-family:var(--font-sans);
+      font-size:13px; cursor:pointer; padding:6px 12px; transition:all var(--ease); white-space:nowrap; }
+    .remove-btn:hover { border-color:#B4453C; color:#B4453C; }
+
     .footnote { margin-top:24px; font-size:12px; color:var(--text-label); }
 
     @media (max-width:480px) {
@@ -265,6 +319,14 @@ TEMPLATE = r"""<!DOCTYPE html>
          Click a school to see who we hired there and how to reach them.</p>
     </section>
 
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" id="tabDirectory" role="tab" aria-selected="true">Directory</button>
+      <button class="tab" id="tabSaved" role="tab" aria-selected="false">
+        Saved contacts <span class="tab__count" id="savedCount">0</span>
+      </button>
+    </div>
+
+    <div id="directoryView">
     <div class="controls">
       <div class="search-row">
         <div class="search">
@@ -335,6 +397,14 @@ TEMPLATE = r"""<!DOCTYPE html>
       <div id="rows"></div>
       <div class="empty" id="empty" hidden>No schools match your search.</div>
     </div>
+    </div><!-- /directoryView -->
+
+    <div id="savedView" hidden>
+      <div id="savedList"></div>
+      <div class="saved-empty" id="savedEmpty" hidden>
+        No saved contacts yet. Open a school, then tap “Save” next to a person to keep them here.
+      </div>
+    </div>
 
     <p class="footnote">Ranking source: __RANKING_SOURCE__</p>
   </div>
@@ -361,7 +431,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     const DATA = __DATA__;
     const SCHOOLS = DATA.schools;
     const CRIT = { ranked:"Top 100", ny:"New York", sf:"San Francisco",
-                   hired:"Has hires", fair:"Career fair", extra:"Also tracked" };
+                   hired:"Current hire", fair:"Career fair", extra:"Also tracked" };
 
     // Recompute "upcoming" against today's date on every load, so a fair that
     // has passed drops off without needing the page to be rebuilt.
@@ -380,6 +450,37 @@ TEMPLATE = r"""<!DOCTYPE html>
       const [y, m, d] = iso.split("-").map(Number);
       return new Date(y, m - 1, d).toLocaleDateString("en-US",
         { month: "short", day: "numeric", year: "numeric" });
+    }
+
+    // ---- Persistent user state: RSVPs + saved contacts (localStorage) ----
+    const LS_KEY = "valon_dir_v1";
+    function loadStore() { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e) { return {}; } }
+    let STORE = loadStore();
+    STORE.rsvp = STORE.rsvp || {};    // fairKey  -> "yes" | "no"
+    STORE.saved = STORE.saved || {};  // contactKey -> {name, school, contacts}
+    function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(STORE)); } catch (e) {} }
+    const fairKey = (school, f) => `${school}||${f.date}||${f.name}`;
+    const contactKey = (school, name) => `${school}||${name}`;
+
+    // Google Calendar "add event" prefilled URL — all-day, no auth required.
+    function gcalUrl(school, f) {
+      const [y, m, d] = f.date.split("-");
+      const start = `${y}${m}${d}`;
+      const dt = new Date(Date.UTC(+y, +m - 1, +d)); dt.setUTCDate(dt.getUTCDate() + 1);
+      const end = `${dt.getUTCFullYear()}${String(dt.getUTCMonth() + 1).padStart(2, "0")}${String(dt.getUTCDate()).padStart(2, "0")}`;
+      const details = `${school} career fair.` + (f.source ? `\nSource: ${f.source}` : "");
+      const p = new URLSearchParams({ action: "TEMPLATE", text: `${f.name} — ${school}`,
+        dates: `${start}/${end}`, details, location: f.location || school });
+      return "https://calendar.google.com/calendar/render?" + p.toString();
+    }
+    function bookmarkIcon() {
+      const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("fill", "none");
+      s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "1.5");
+      s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round");
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      p.setAttribute("d", "M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"); s.appendChild(p);
+      return s;
     }
 
     const rowsEl = document.getElementById("rows");
@@ -466,6 +567,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         if (s.criteria.includes("ranked")) nameWrap.appendChild(tag("ranked"));
         if (s.criteria.includes("ny")) nameWrap.appendChild(tag("ny"));
         if (s.criteria.includes("sf")) nameWrap.appendChild(tag("sf"));
+        if (s.criteria.includes("hired")) nameWrap.appendChild(tag("hired"));
         main.appendChild(nameWrap);
 
         const nextFair = upcomingFairs(s)[0];
@@ -533,7 +635,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       modalBody.textContent = "";
 
       // Build a single .fair row element (shared by upcoming + passed).
-      function fairRow(f) {
+      function fairRow(f, allowRsvp) {
         const [y, m, d] = f.date.split("-").map(Number);
         const row = document.createElement("div"); row.className = "fair";
         const dbox = document.createElement("div"); dbox.className = "fair__date";
@@ -555,6 +657,43 @@ TEMPLATE = r"""<!DOCTYPE html>
           a.rel = "noopener"; a.textContent = "Source / register";
           sc.appendChild(a); body.appendChild(sc);
         }
+
+        // "Planning to attend?" RSVP + add-to-Google-Calendar (upcoming only).
+        if (allowRsvp) {
+          const key = fairKey(s.name, f);
+          const rsvp = document.createElement("div"); rsvp.className = "fair__rsvp";
+          const q = document.createElement("span"); q.className = "fair__rsvp-q";
+          q.textContent = "Planning to attend?";
+          const yes = document.createElement("button");
+          yes.type = "button"; yes.className = "rsvp-btn"; yes.dataset.ans = "yes"; yes.textContent = "Yes";
+          const no = document.createElement("button");
+          no.type = "button"; no.className = "rsvp-btn"; no.dataset.ans = "no"; no.textContent = "No";
+          const gcal = document.createElement("a"); gcal.className = "gcal";
+          gcal.href = gcalUrl(s.name, f); gcal.target = "_blank"; gcal.rel = "noopener";
+          gcal.appendChild(calIcon());
+          const gt = document.createElement("span"); gt.textContent = "Add to Google Calendar";
+          gcal.appendChild(gt);
+          const reflect = () => {
+            const v = STORE.rsvp[key];
+            yes.setAttribute("aria-pressed", String(v === "yes"));
+            no.setAttribute("aria-pressed", String(v === "no"));
+            gcal.style.display = v === "yes" ? "inline-flex" : "none";
+          };
+          const setAns = (ans) => {
+            if (STORE.rsvp[key] === ans) delete STORE.rsvp[key];
+            else STORE.rsvp[key] = ans;
+            persist(); reflect();
+          };
+          yes.addEventListener("click", () => {
+            setAns("yes");
+            if (STORE.rsvp[key] === "yes") window.open(gcal.href, "_blank", "noopener");
+          });
+          no.addEventListener("click", () => setAns("no"));
+          rsvp.appendChild(q); rsvp.appendChild(yes); rsvp.appendChild(no); rsvp.appendChild(gcal);
+          body.appendChild(rsvp);
+          reflect();
+        }
+
         row.appendChild(dbox); row.appendChild(body);
         return row;
       }
@@ -566,7 +705,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         const t = document.createElement("p"); t.className = "fairs__title";
         t.textContent = `Upcoming career fair${fairs.length === 1 ? "" : "s"} (${fairs.length})`;
         wrap.appendChild(t);
-        fairs.forEach(f => wrap.appendChild(fairRow(f)));
+        fairs.forEach(f => wrap.appendChild(fairRow(f, true)));
         modalBody.appendChild(wrap);
       }
 
@@ -577,7 +716,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         const t = document.createElement("p"); t.className = "fairs__title";
         t.textContent = "Recently passed";
         wrap.appendChild(t);
-        wrap.appendChild(fairRow(past));
+        wrap.appendChild(fairRow(past, false));
         modalBody.appendChild(wrap);
       }
       if (!s.hires.length) {
@@ -594,9 +733,30 @@ TEMPLATE = r"""<!DOCTYPE html>
       } else {
         const hireRow = (h) => {
           const row = document.createElement("div"); row.className = "hire";
+          const head = document.createElement("div"); head.className = "hire__head";
           const nm = document.createElement("div"); nm.className = "hire__name";
           nm.textContent = h.name || "(name unavailable)";
-          row.appendChild(nm);
+          head.appendChild(nm);
+          // Save-contact toggle (persists to the Saved tab).
+          const key = contactKey(s.name, h.name || "");
+          const save = document.createElement("button");
+          save.type = "button"; save.className = "save-btn";
+          save.appendChild(bookmarkIcon());
+          const lbl = document.createElement("span"); save.appendChild(lbl);
+          const reflectSave = () => {
+            const on = !!STORE.saved[key];
+            save.setAttribute("aria-pressed", String(on));
+            lbl.textContent = on ? "Saved" : "Save";
+          };
+          save.addEventListener("click", () => {
+            if (STORE.saved[key]) delete STORE.saved[key];
+            else STORE.saved[key] = { name: h.name || "(name unavailable)",
+                                      school: s.name, contacts: h.contacts || [] };
+            persist(); reflectSave(); updateSavedCount();
+          });
+          reflectSave();
+          head.appendChild(save);
+          row.appendChild(head);
           if (h.contacts.length) {
             const cc = document.createElement("div"); cc.className = "contacts";
             h.contacts.forEach(c => cc.appendChild(contactChip(c)));
@@ -676,6 +836,69 @@ TEMPLATE = r"""<!DOCTYPE html>
       rerender();
     });
 
+    // ---- Saved-contacts tab ----
+    function updateSavedCount() {
+      document.getElementById("savedCount").textContent = Object.keys(STORE.saved).length;
+    }
+    function renderSaved() {
+      const listEl = document.getElementById("savedList");
+      const emptyEl2 = document.getElementById("savedEmpty");
+      listEl.textContent = "";
+      const entries = Object.entries(STORE.saved);
+      emptyEl2.hidden = entries.length !== 0;
+      entries.sort((a, b) => (a[1].school + a[1].name).localeCompare(b[1].school + b[1].name));
+      entries.forEach(([key, c]) => {
+        const card = document.createElement("div"); card.className = "saved-card";
+        const top = document.createElement("div"); top.className = "saved-card__top";
+        const info = document.createElement("div");
+        const nm = document.createElement("div"); nm.className = "saved-card__name"; nm.textContent = c.name;
+        const sch = document.createElement("div"); sch.className = "saved-card__school"; sch.textContent = c.school;
+        info.appendChild(nm); info.appendChild(sch);
+        const rm = document.createElement("button"); rm.type = "button"; rm.className = "remove-btn"; rm.textContent = "Remove";
+        rm.addEventListener("click", () => { delete STORE.saved[key]; persist(); updateSavedCount(); renderSaved(); });
+        top.appendChild(info); top.appendChild(rm);
+        card.appendChild(top);
+        if (c.contacts && c.contacts.length) {
+          const cc = document.createElement("div"); cc.className = "contacts"; cc.style.marginTop = "10px";
+          c.contacts.forEach(x => cc.appendChild(contactChip(x)));
+          card.appendChild(cc);
+        }
+        const school = SCHOOLS.find(x => x.name === c.school);
+        const ups = school ? upcomingFairs(school) : [];
+        const fw = document.createElement("div"); fw.className = "saved-card__fairs";
+        if (ups.length) {
+          const ttl = document.createElement("p"); ttl.className = "fairs__title";
+          ttl.textContent = `${c.school} — upcoming career fair${ups.length === 1 ? "" : "s"}`;
+          fw.appendChild(ttl);
+          ups.forEach(f => {
+            const r = document.createElement("div"); r.className = "saved-card__fair";
+            const b = document.createElement("b"); b.textContent = fmtDate(f.date);
+            const n = document.createElement("span"); n.textContent = "· " + f.name;
+            r.appendChild(b); r.appendChild(n); fw.appendChild(r);
+          });
+          card.appendChild(fw);
+        } else {
+          const none = document.createElement("div"); none.className = "saved-card__none";
+          none.textContent = `No upcoming career fairs listed for ${c.school}.`;
+          card.appendChild(none);
+        }
+        listEl.appendChild(card);
+      });
+    }
+    const dirView = document.getElementById("directoryView");
+    const savView = document.getElementById("savedView");
+    const tabDir = document.getElementById("tabDirectory");
+    const tabSav = document.getElementById("tabSaved");
+    function showTab(saved) {
+      tabSav.setAttribute("aria-selected", String(saved));
+      tabDir.setAttribute("aria-selected", String(!saved));
+      savView.hidden = !saved; dirView.hidden = saved;
+      if (saved) renderSaved();
+    }
+    tabDir.addEventListener("click", () => showTab(false));
+    tabSav.addEventListener("click", () => showTab(true));
+
+    updateSavedCount();
     updateFilterCount();
     render();
   </script>

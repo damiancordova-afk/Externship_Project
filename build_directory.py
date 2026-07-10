@@ -400,10 +400,7 @@ def extract_contacts(row):
             if url and t in want:
                 contacts.append({"kind": t, "label": want[t],
                                  "value": url, "href": url})
-    phone = row.get("primaryPhoneNumber.value")
-    if pd.notna(phone):
-        contacts.append({"kind": "phone", "label": "Phone",
-                         "value": str(phone), "href": f"tel:{phone}"})
+    # Phone numbers intentionally excluded from the directory.
     pu = row.get("profileUrl")
     if pd.notna(pu):
         contacts.append({"kind": "ashby", "label": "Ashby profile",
