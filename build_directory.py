@@ -382,8 +382,9 @@ def load_fairs():
     today = _dt.date.today().isoformat()
     by_key = defaultdict(list)
     for fair in data.get("fairs", []):
-        if fair.get("date", "") < today:      # only surface upcoming fairs
-            continue
+        # Keep past fairs too - the template shows the single most-recently-passed
+        # one per school in a "recently passed" section. (Older past ones are
+        # pruned upstream by the scraper so the feed doesn't accumulate.)
         matches = canonicalize(fair.get("college", ""))
         if not matches:
             continue
@@ -394,10 +395,17 @@ def load_fairs():
             "location": fair.get("location", ""),
             "source": fair.get("source", ""),
         })
-    for k in by_key:
-        by_key[k].sort(key=lambda x: x["date"])
+    # Per school, keep all UPCOMING fairs + at most the 1 most-recently-passed.
+    trimmed = {}
+    for k, fs in by_key.items():
+        fs.sort(key=lambda x: x["date"])
+        upcoming = [f for f in fs if f["date"] >= today]
+        past = [f for f in fs if f["date"] < today]
+        keep = upcoming + (past[-1:] if past else [])   # past[-1] = most recent
+        keep.sort(key=lambda x: x["date"])
+        trimmed[k] = keep
     meta = {"note": data.get("note", ""), "lastScraped": data.get("last_scraped")}
-    return by_key, meta
+    return trimmed, meta
 
 
 def main():
@@ -430,8 +438,10 @@ def main():
                 rec["person_ids"].add(pid)
                 rec["hires"].append(hire)
 
-    # Career-fair feed: upcoming fairs grouped by school key.
+    # Career-fair feed: fairs (upcoming + <=1 recently-passed) grouped by key.
     fairs_by_key, fairs_meta = load_fairs()
+    import datetime as _dt
+    today_iso = _dt.date.today().isoformat()
 
     # Seed 0-hire schools from the target-list criteria (incl. fair-only schools).
     for k in TOP_KEYS | NY_KEYS | SF_KEYS | EXTRA_KEYS | set(fairs_by_key):
@@ -458,7 +468,7 @@ def main():
             criteria.append("sf")
         if k in EXTRA_KEYS:
             criteria.append("extra")
-        if fairs:
+        if any(f["date"] >= today_iso for f in fairs):   # tag = has an UPCOMING fair
             criteria.append("fair")
         if rec["hires"]:
             criteria.append("hired")
