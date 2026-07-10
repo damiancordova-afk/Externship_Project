@@ -47,6 +47,15 @@
       "source": "https://www.brooklyn.edu/magner/employers/job-fair/"
     },
     {
+      "college": "California Institute of Technology",
+      "name": "Career fair",
+      "date": "2026-10-07",
+      "location": "",
+      "source": "https://calendar.ucsd.edu/event/fall-2026-career-fair",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
       "college": "Carnegie Mellon University",
       "name": "STEM Career Fair (In-Person)",
       "date": "2026-09-15",
@@ -77,6 +86,33 @@
       "scraped_at": "2026-07-10"
     },
     {
+      "college": "Columbia University",
+      "name": "The",
+      "date": "2026-09-17",
+      "location": "",
+      "source": "https://careerdesignlab.sps.columbia.edu/career-networking-expo",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Cornell University",
+      "name": "Career fair",
+      "date": "2026-09-15",
+      "location": "",
+      "source": "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Cornell University",
+      "name": "Career fair",
+      "date": "2026-09-17",
+      "location": "",
+      "source": "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
       "college": "Dartmouth College",
       "name": "Fall Term Student Job Fair",
       "date": "2026-09-15",
@@ -92,24 +128,6 @@
     },
     {
       "college": "Florida State University",
-      "name": "Standard Registration Off-Campus Employers $75.00 FSU Departments Free The last",
-      "date": "2026-08-12",
-      "location": "",
-      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Florida State University",
-      "name": "The last day to cancel any part of your registration (full or add-ons) for the E",
-      "date": "2026-08-23",
-      "location": "",
-      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Florida State University",
       "name": "Seminole Futures Job & Internship Fair",
       "date": "2026-09-24",
       "location": "Donald L. Tucker Civic Center",
@@ -117,7 +135,7 @@
     },
     {
       "college": "Florida State University",
-      "name": "FSU Panama City Job & Internship Fair Register Now",
+      "name": "FSU Panama City Job & Internship Fair",
       "date": "2026-09-30",
       "location": "",
       "source": "https://career.fsu.edu/employers/attend-a-career-fair",
@@ -316,6 +334,24 @@
       "source": "https://engr.ncsu.edu/careerfair/"
     },
     {
+      "college": "Northwestern University",
+      "name": "NCA Virtual Career Fair",
+      "date": "2026-09-09",
+      "location": "",
+      "source": "https://www.northwestern.edu/careers/programs-opportunities/career-fairs-at-northwestern.html",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Northwestern University",
+      "name": "NCA In Person Career Fair",
+      "date": "2026-09-29",
+      "location": "",
+      "source": "https://www.northwestern.edu/careers/programs-opportunities/career-fairs-at-northwestern.html",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
       "college": "Pace University",
       "name": "Fall 2026 Job and Internship Fair (PLV Campus)",
       "date": "2026-10-09",
@@ -436,7 +472,7 @@
     },
     {
       "college": "Purdue University",
-      "name": "We would like to formally invite you to our Computing Career Fair! This upcoming",
+      "name": "We would like to formally invite you to our Computing Career Fair",
       "date": "2026-10-07",
       "location": "",
       "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
@@ -559,15 +595,6 @@
     {
       "college": "San Jose State University",
       "name": "Career fair",
-      "date": "2026-08-27",
-      "location": "",
-      "source": "https://careercenter.sjsu.edu/events/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "San Jose State University",
-      "name": "Career fair",
       "date": "2026-09-01",
       "location": "",
       "source": "https://careercenter.sjsu.edu/events/",
@@ -589,8 +616,26 @@
       "source": "https://www.stjohns.edu/life-st-johns/career-development/employers"
     },
     {
+      "college": "Stanford University",
+      "name": "Career fair",
+      "date": "2026-10-06",
+      "location": "",
+      "source": "https://careered.stanford.edu/career-fairs",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Stanford University",
+      "name": "Career fair",
+      "date": "2027-04-13",
+      "location": "",
+      "source": "https://careered.stanford.edu/careerfairs",
+      "auto": true,
+      "scraped_at": "2026-07-10"
+    },
+    {
       "college": "Syracuse University",
-      "name": "Fall 2026 Career Fair: Engineering & Computer Science, Info Studies, Architecture",
+      "name": "Fall 2026 Career Fair",
       "date": "2026-09-30",
       "location": "JMA Wireless Dome",
       "source": "https://ecs.syracuse.edu/career-services/upcoming-career-fair"
@@ -773,7 +818,7 @@
     },
     {
       "college": "University of Colorado Boulder",
-      "name": "Civil, Environmental and Architectural Engineering Career & Internship Fair",
+      "name": "Environmental and Architectural Engineering Career & Internship Fair",
       "date": "2026-09-30",
       "location": "Glenn Miller Ballroom, UMC",
       "source": "https://www.colorado.edu/ceae/current-students/student-enrichment/career-fairs"
@@ -1093,7 +1138,7 @@
     },
     {
       "college": "University of Washington Bothell",
-      "name": "Spring Quarter Spring Job & Internship Fair – Tuesday,",
+      "name": "Spring Quarter Spring Job & Internship Fair",
       "date": "2027-04-20",
       "location": "",
       "source": "https://www.uwb.edu/career-services/employers/career-fairs",

@@ -32,6 +32,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
+      - name: Install Chromium (only if a source needs JS rendering)
+        run: |
+          if [ -f fair_sources.json ] && grep -q '"render"' fair_sources.json; then
+            python -m playwright install --with-deps chromium
+          else
+            echo "No render:true sources — skipping Chromium install."
+          fi
+
       - name: Scrape fairs + monthly discovery
         # Scraping runs every week. The discovery step self-throttles to ~monthly
         # and only does anything when a search-API key is present. Any of these

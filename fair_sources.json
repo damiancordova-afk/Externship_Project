@@ -1,0 +1,114 @@
+{
+  "Brown University": [
+    {
+      "url": "https://events.brown.edu/live/events/323260-2026-startup-career-fair-virtual",
+      "render": true
+    },
+    {
+      "url": "https://ibes.brown.edu/climate-career-fair",
+      "render": true
+    },
+    {
+      "url": "https://planetary-health.brown.edu/event/climate-career-fair-march-5-2026",
+      "render": true
+    }
+  ],
+  "California Institute of Technology": [
+    {
+      "url": "https://career.caltech.edu/events",
+      "render": true
+    },
+    {
+      "url": "https://career.caltech.edu/employers/career-fairs-for-employers",
+      "render": true
+    },
+    {
+      "url": "https://calendar.ucsd.edu/event/fall-2026-career-fair",
+      "render": true
+    }
+  ],
+  "Columbia University": [
+    {
+      "url": "https://careerdesignlab.sps.columbia.edu/career-networking-expo",
+      "render": true
+    },
+    {
+      "url": "https://www.publichealth.columbia.edu/become-student/career-services/employers/career-day",
+      "render": true
+    },
+    {
+      "url": "https://gocolumbia.edu/career_job_placement_services/career_events.html",
+      "render": true
+    }
+  ],
+  "Cornell University": [
+    {
+      "url": "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days",
+      "render": true
+    },
+    {
+      "url": "https://career.cornell.edu/recruiting-at-cornell-career-fairs",
+      "render": true
+    },
+    {
+      "url": "https://career.cornell.edu/videos/preparing-for-career-fairs",
+      "render": true
+    }
+  ],
+  "Harvard University": [
+    {
+      "url": "https://careerservices.fas.harvard.edu/events",
+      "render": true
+    },
+    {
+      "url": "https://careerservices.fas.harvard.edu/resources/data-analytics-science-technology-fair",
+      "render": true
+    },
+    {
+      "url": "https://careerservices.fas.harvard.edu/resources/startup-career-fair",
+      "render": true
+    }
+  ],
+  "Northwestern University": [
+    {
+      "url": "https://www.nmc.edu/student-services/advising-center/career-fair",
+      "render": true
+    },
+    {
+      "url": "https://www.northwestern.edu/careers/programs-opportunities/career-fairs-at-northwestern.html",
+      "render": true
+    },
+    {
+      "url": "https://www.northwestern.edu/recruit/recruit-at-northwestern/participate-in-career-fairs.html",
+      "render": true
+    }
+  ],
+  "Stanford University": [
+    {
+      "url": "https://qfarm.stanford.edu/events/conference-workshop/2026-27-quantum-career-fair",
+      "render": true
+    },
+    {
+      "url": "https://careered.stanford.edu/career-fairs",
+      "render": true
+    },
+    {
+      "url": "https://careered.stanford.edu/careerfairs",
+      "render": true
+    }
+  ],
+  "University of California, Los Angeles": [
+    {
+      "url": "https://career.ucla.edu/events",
+      "render": true
+    },
+    {
+      "url": "https://career.ucla.edu",
+      "render": true
+    },
+    {
+      "url": "https://careers.usc.edu/fall-career-fair",
+      "render": true
+    }
+  ]
+}

@@ -3,3 +3,7 @@ beautifulsoup4>=4.12
 # Needed by the monthly discovery step: it imports build_directory (which uses
 # pandas) to load the target school list. Scraping itself doesn't need pandas.
 pandas>=2.0
+# Headless-browser rendering for JS career pages. The library is light; the
+# Chromium binary is only installed in CI when a fair_sources.json entry sets
+# "render": true (see the workflow). Code falls back to plain fetch without it.
+playwright>=1.40

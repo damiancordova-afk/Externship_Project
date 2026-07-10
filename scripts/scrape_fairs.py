@@ -129,6 +129,25 @@ def find_dates(text: str) -> list[str]:
 # ----------------------------------------------------------------------------
 # Extractors
 # ----------------------------------------------------------------------------
+_FAIR_NAME = re.compile(
+    r"([A-Z][\w &'\-/]{0,55}?(?:Career Fair|Job Fair|Career Expo|Internship Fair|"
+    r"Job & Internship Fair|Career & Internship Fair|Hiring Expo|Engineering Expo|"
+    r"Tech Fair|Career Day|Recruiting Day))", re.I)
+_NAME_JUNK = ("last day", "cancel", "registration", "register now", "$", "you ",
+              "your ", "we would", "click ", "sign up", "deadline", "off-campus employers")
+
+
+def clean_fair_name(raw: str) -> str:
+    """Turn a messy block into a clean fair name, or fall back to 'Career fair'.
+    Fixes junk like 'The last day to cancel any part of your registration…'."""
+    n = raw.strip(" -–—:·|").strip()
+    low = n.lower()
+    if len(n) <= 70 and not any(w in low for w in _NAME_JUNK):
+        return n[:80]
+    m = _FAIR_NAME.search(n)             # salvage a real fair name from the noise
+    return m.group(1).strip() if m else "Career fair"
+
+
 def generic_extractor(html: str, college: str, url: str) -> list[dict]:
     """
     Conservative default: split the page into blocks, and for any block that
@@ -159,10 +178,10 @@ def generic_extractor(html: str, college: str, url: str) -> list[dict]:
         dates = find_dates(block)
         if not dates:
             continue
-        # Name: text up to the first date-ish token, trimmed.
-        name = re.split(r"\b[A-Za-z]{3,9}\.?\s+\d{1,2}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{2,4}",
-                        block)[0].strip(" -–—:·|")
-        name = (name[:80] or "Career fair").strip()
+        # Name: text up to the first date-ish token, cleaned of registration noise.
+        head = re.split(r"\b[A-Za-z]{3,9}\.?\s+\d{1,2}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{2,4}",
+                        block)[0]
+        name = clean_fair_name(head) or "Career fair"
         for iso in dates:
             if iso in seen:
                 continue
@@ -177,12 +196,99 @@ def generic_extractor(html: str, college: str, url: str) -> list[dict]:
     return rows
 
 
-# Site-specific extractors go here, keyed by college. Signature matches
-# generic_extractor(html, college, url) -> list[dict]. Fill these in as pages
-# prove too dynamic/irregular for the generic pass.
+def _unfold_ics(text: str) -> list[str]:
+    """RFC-5545 line unfolding (continuation lines begin with space/tab)."""
+    out: list[str] = []
+    for line in text.splitlines():
+        if line[:1] in (" ", "\t") and out:
+            out[-1] += line[1:]
+        else:
+            out.append(line)
+    return out
+
+
+def ics_extractor(text: str, college: str, url: str) -> list[dict]:
+    """Parse an iCal/.ics feed's VEVENTs into fair rows (career-fair events only)."""
+    if not text or "BEGIN:VEVENT" not in text:
+        return []
+    rows, seen, cur = [], set(), {}
+    for line in _unfold_ics(text):
+        if line.startswith("BEGIN:VEVENT"):
+            cur = {}
+        elif line.startswith("END:VEVENT"):
+            summ, dt = cur.get("summary", ""), cur.get("dtstart", "")
+            m = re.search(r"(\d{4})(\d{2})(\d{2})", dt) if dt else None
+            iso = _mk(int(m.group(1)), int(m.group(2)), int(m.group(3))) if m else None
+            if iso and KEYWORDS.search(summ) and not NEGATIVE.search(summ):
+                key = (iso, summ)
+                if key not in seen:
+                    seen.add(key)
+                    rows.append({"college": college, "name": clean_fair_name(summ),
+                                 "date": iso, "location": cur.get("location", ""),
+                                 "source": url})
+            cur = {}
+        elif line.startswith("SUMMARY"):
+            cur["summary"] = line.split(":", 1)[-1].strip()
+        elif line.startswith("DTSTART"):
+            cur["dtstart"] = line.split(":", 1)[-1].strip()
+        elif line.startswith("LOCATION"):
+            cur["location"] = line.split(":", 1)[-1].strip()
+    return rows
+
+
+def rss_extractor(text: str, college: str, url: str) -> list[dict]:
+    """Parse an RSS/Atom event feed: dates from each item's title/description."""
+    if not text:
+        return []
+    rows, seen = [], set()
+    for it in re.findall(r"<(?:item|entry)\b.*?</(?:item|entry)>", text, re.S | re.I):
+        tm = re.search(r"<title[^>]*>(.*?)</title>", it, re.S | re.I)
+        title = re.sub(r"<.*?>", "", tm.group(1)) if tm else ""
+        title = re.sub(r"^\s*<!\[CDATA\[|\]\]>\s*$", "", title).strip()
+        body = re.sub(r"<.*?>", " ", it)
+        blob = f"{title} {body}"
+        if not KEYWORDS.search(blob) or NEGATIVE.search(blob):
+            continue
+        for iso in find_dates(blob):
+            key = (iso, title)
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append({"college": college, "name": clean_fair_name(title) or "Career fair",
+                         "date": iso, "location": "", "source": url})
+    return rows
+
+
+# Site-specific extractors, keyed by college. Signature matches
+# generic_extractor(html, college, url) -> list[dict]. Add one when a school's
+# page is too irregular for the generic/ics/rss passes. Example scaffold:
+#
+#   def _mit_extractor(html, college, url):
+#       from bs4 import BeautifulSoup
+#       soup = BeautifulSoup(html, "html.parser")
+#       rows = []
+#       for card in soup.select(".event-card"):        # <- site-specific selectors
+#           name = card.select_one(".title").get_text(strip=True)
+#           date = find_dates(card.select_one(".date").get_text())
+#           ...
+#       return rows
+#
 EXTRACTORS: dict[str, callable] = {
-    # "MIT": mit_extractor,
+    # "Massachusetts Institute of Technology": _mit_extractor,
 }
+
+
+def pick_extractor(college: str, url: str, html: str):
+    """Choose the right extractor: site-specific > ics > rss > generic."""
+    if college in EXTRACTORS:
+        return EXTRACTORS[college]
+    u = (url or "").lower()
+    head = (html or "")[:600].lower()
+    if u.endswith(".ics") or "ical" in u or "format=ics" in u or "begin:vcalendar" in head:
+        return ics_extractor
+    if u.endswith((".rss", ".xml")) or "/feed" in u or "<rss" in head or "<feed" in head:
+        return rss_extractor
+    return generic_extractor
 
 # Schools the scraper cannot reach — their fair dates live behind a login
 # (Handshake / 12twenty) or a bot wall, and Valon has no API access. These are
@@ -198,7 +304,9 @@ MANUAL_COLLEGES = {
 # ----------------------------------------------------------------------------
 # Fetch + orchestrate
 # ----------------------------------------------------------------------------
-def fetch(url: str, timeout: int = 20) -> str | None:
+def fetch(url: str, timeout: int = 20, render: bool = False) -> str | None:
+    if render:
+        return fetch_rendered(url, timeout=max(timeout, 30))
     try:
         import requests  # type: ignore
     except ImportError:
@@ -213,6 +321,29 @@ def fetch(url: str, timeout: int = 20) -> str | None:
         return None
 
 
+def fetch_rendered(url: str, timeout: int = 30) -> str | None:
+    """Fetch a JS-rendered page with a headless browser (Playwright), so client-
+    side calendars (Handshake widgets, GT/Cornell) produce real HTML. Falls back
+    to a plain fetch if Playwright (or its browser) isn't installed."""
+    try:
+        from playwright.sync_api import sync_playwright  # type: ignore
+    except ImportError:
+        print("  ! playwright not installed; add it + `playwright install chromium` "
+              "to render JS pages. Falling back to plain fetch.", file=sys.stderr)
+        return fetch(url, timeout=timeout, render=False)
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(user_agent=USER_AGENT)
+            page.goto(url, wait_until="networkidle", timeout=timeout * 1000)
+            html = page.content()
+            browser.close()
+            return html
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! rendered fetch failed for {url}: {e}; falling back", file=sys.stderr)
+        return fetch(url, timeout=timeout, render=False)
+
+
 def sources_from(fairs: list[dict]) -> dict[str, list[str]]:
     """Group the distinct source URLs we already know about, per college."""
     by: dict[str, list[str]] = {}
@@ -224,30 +355,39 @@ def sources_from(fairs: list[dict]) -> dict[str, list[str]]:
 
 
 def scrape(fairs: list[dict], curated_sources: dict, use_net: bool) -> list[dict]:
-    """Existing behavior, UNCHANGED: fetch each known career-center URL and
-    extract fair dates. Now also scrapes any curated/approved URLs from
-    fair_sources.json, so discovered-and-approved sites feed the same pipeline."""
+    """Fetch each known career-center URL and extract fair dates. Sources come
+    from the existing feed AND curated fair_sources.json. Each source can be a
+    plain URL string, or {"url": ..., "render": true} to fetch via headless
+    browser. The extractor is auto-chosen: site-specific > .ics > RSS > generic."""
     if not use_net:
         print("(--no-net) skipping fetch; nothing new scraped")
         return []
-    # Targets = URLs already in the feed  +  curated/approved URLs.
-    targets: dict[str, list[str]] = sources_from(fairs)
+    # college -> list of (url, render_bool), de-duplicated by url.
+    targets: dict[str, list[tuple[str, bool]]] = {}
+    for f in fairs:
+        if f.get("source"):
+            lst = targets.setdefault(f["college"], [])
+            if not any(x[0] == f["source"] for x in lst):
+                lst.append((f["source"], False))
     for college, urls in (curated_sources or {}).items():
-        targets.setdefault(college, [])
+        lst = targets.setdefault(college, [])
         for u in urls:
-            if u and u not in targets[college]:
-                targets[college].append(u)
+            url = u.get("url") if isinstance(u, dict) else u
+            render = bool(u.get("render")) if isinstance(u, dict) else False
+            if url and not any(x[0] == url for x in lst):
+                lst.append((url, render))
+
     found: list[dict] = []
     for college, urls in targets.items():
         if college in MANUAL_COLLEGES:
             print(f"· {college}: manual-entry school — skipping")
             continue
-        extractor = EXTRACTORS.get(college, generic_extractor)
-        for url in urls:
-            print(f"· {college}: {url}")
-            html = fetch(url)
+        for url, render in urls:
+            print(f"· {college}: {url}{' [rendered]' if render else ''}")
+            html = fetch(url, render=render)
+            extractor = pick_extractor(college, url, html)
             rows = extractor(html, college, url) if html else []
-            print(f"    {len(rows)} candidate row(s)")
+            print(f"    {len(rows)} candidate row(s)  ({extractor.__name__})")
             found.extend(rows)
     return found
 
