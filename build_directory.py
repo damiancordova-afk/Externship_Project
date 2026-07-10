@@ -250,6 +250,21 @@ except FileNotFoundError:
     pass
 
 
+def _name_key(s):
+    """Normalized key for matching a person's name (roster <-> hire)."""
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", str(s).lower())).strip()
+
+
+# Confirmed current employees (git-ignored; employee PII). A hire whose name is
+# in this set is shown under "Current Employees"; everyone else is "Past Hires".
+CURRENT_EMPLOYEES = set()
+try:
+    with open("current_employees.json") as _f:
+        CURRENT_EMPLOYEES = {_name_key(n) for n in json.load(_f)}
+except FileNotFoundError:
+    pass
+
+
 def parse(v):
     if pd.isna(v):
         return None
@@ -425,6 +440,7 @@ def main():
         contacts = extract_contacts(row)
         name = row.get("name")
         hire = {"name": (None if pd.isna(name) else str(name)),
+                "current": (pd.notna(name) and _name_key(name) in CURRENT_EMPLOYEES),
                 "contacts": contacts}
         raw_eff = _RESOLVE_BY_ID.get(pid, raw)          # manual correction wins
         has_linkedin = any(ct["kind"] == "linkedin" for ct in contacts)
