@@ -41,6 +41,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 JSON_PATH = ROOT / "career_fairs.json"
+SOURCES_PATH = ROOT / "fair_sources.json"          # curated, reviewed source URLs
+PENDING_PATH = ROOT / "fair_sources_pending.json"  # discovery output awaiting review
+
+# Discovery is self-throttled to ~monthly (the Action itself runs weekly). Free
+# search-API tiers are small, so each run caps its queries and rotates through
+# target schools across months.
+DISCOVERY_INTERVAL_DAYS = 30
+DISCOVERY_QUERY_BUDGET = 40
 
 TODAY = dt.date.today()
 # Only accept plausible dates: last year through two years out. Anything else is
@@ -215,12 +223,22 @@ def sources_from(fairs: list[dict]) -> dict[str, list[str]]:
     return by
 
 
-def scrape(fairs: list[dict], use_net: bool) -> list[dict]:
+def scrape(fairs: list[dict], curated_sources: dict, use_net: bool) -> list[dict]:
+    """Existing behavior, UNCHANGED: fetch each known career-center URL and
+    extract fair dates. Now also scrapes any curated/approved URLs from
+    fair_sources.json, so discovered-and-approved sites feed the same pipeline."""
     if not use_net:
         print("(--no-net) skipping fetch; nothing new scraped")
         return []
+    # Targets = URLs already in the feed  +  curated/approved URLs.
+    targets: dict[str, list[str]] = sources_from(fairs)
+    for college, urls in (curated_sources or {}).items():
+        targets.setdefault(college, [])
+        for u in urls:
+            if u and u not in targets[college]:
+                targets[college].append(u)
     found: list[dict] = []
-    for college, urls in sources_from(fairs).items():
+    for college, urls in targets.items():
         if college in MANUAL_COLLEGES:
             print(f"· {college}: manual-entry school — skipping")
             continue
@@ -264,11 +282,203 @@ def write_json(data: dict, fairs: list[dict]) -> None:
                          encoding="utf-8")
 
 
-def prune_past(fairs: list[dict]) -> tuple[list[dict], int]:
-    """Drop fairs that have already happened; the feed is forward-looking."""
+def prune_stale(fairs: list[dict]) -> tuple[list[dict], int]:
+    """Keep every UPCOMING fair, plus at most the single most-recently-passed fair
+    per college (so a 'recently passed' one survives but old ones don't pile up).
+    The directory renders that one passed fair in a separate section."""
     today_iso = TODAY.isoformat()
-    kept = [f for f in fairs if f.get("date", "") >= today_iso]
-    return kept, len(fairs) - len(kept)
+    by_college: dict[str, list[dict]] = {}
+    for f in fairs:
+        by_college.setdefault(f["college"], []).append(f)
+    kept: list[dict] = []
+    dropped = 0
+    for _college, fs in by_college.items():
+        upcoming = [f for f in fs if f.get("date", "") >= today_iso]
+        past = sorted((f for f in fs if f.get("date", "") < today_iso),
+                      key=lambda x: x["date"])
+        kept.extend(upcoming)
+        if past:
+            kept.append(past[-1])       # most-recently-passed only
+            dropped += len(past) - 1    # older past fairs pruned
+    kept.sort(key=lambda f: (f["college"], f["date"]))
+    return kept, dropped
+
+
+# ----------------------------------------------------------------------------
+# Discovery: web-search for NEW career-fair / job-board sites not on our list.
+# Runs alongside (not instead of) the scraper. Self-throttled to ~monthly.
+# Candidates are written to PENDING_PATH for human review; NEVER auto-added.
+# ----------------------------------------------------------------------------
+def _read_json(path: Path, default):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return default
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! could not read {path.name}: {e}", file=sys.stderr)
+        return default
+
+
+def discovery_targets() -> list[str]:
+    """The curated target schools (Top-100 / NY / SF / extra) to search for.
+    Loaded from build_directory so the two never drift. No candidate PII."""
+    try:
+        sys.path.insert(0, str(ROOT))
+        from build_directory import (  # type: ignore
+            TOP_NATIONAL, NY_FOUR_YEAR, SF_FOUR_YEAR, EXTRA_TRACKED)
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! discovery: cannot load school lists ({e})", file=sys.stderr)
+        return []
+    seen, out = set(), []
+    for n in TOP_NATIONAL + NY_FOUR_YEAR + SF_FOUR_YEAR + EXTRA_TRACKED:
+        if n not in seen:
+            seen.add(n)
+            out.append(n)
+    return out
+
+
+_NEG_DOMAIN = re.compile(
+    r"(facebook|twitter|reddit|wikipedia|youtube|instagram|indeed|glassdoor|"
+    r"ziprecruiter|linkedin)\.com", re.I)
+_POS_SOURCE = re.compile(
+    r"career.?fair|/career|/careers|career-?center|career-?services|/events|"
+    r"joinhandshake\.com|symplicity|12twenty", re.I)
+
+
+def plausible_source(url: str) -> bool:
+    u = (url or "").lower()
+    if not u.startswith("http") or _NEG_DOMAIN.search(u):
+        return False
+    if _POS_SOURCE.search(u):
+        return True
+    return ".edu" in u and ("career" in u or "event" in u)
+
+
+def source_score(url: str) -> int:
+    """Rough relevance rank so real official career pages sort to the top of the
+    review file and noise sinks to the bottom. Higher = more likely legit."""
+    u = (url or "").lower()
+    score = 0
+    if ".edu" in u:
+        score += 3
+    if re.search(r"career.?fair|career-?center|career-?services|/careers?\b", u):
+        score += 2
+    if "/events" in u:
+        score += 1
+    if re.search(r"symplicity|joinhandshake|12twenty|careereco", u):
+        score += 1                      # real recruiting platforms
+    if re.search(r"blog|press-?room|press-?release|/news|forum|/event/", u):
+        score -= 2                      # articles / one-off event pages, not schedules
+    return score
+
+
+def web_search(query: str, num: int = 6):
+    """Return [(title, url)] via whichever Search API key is set, [] on error,
+    or None if NO backend is configured (so discovery can no-op cleanly)."""
+    import os
+    try:
+        import requests  # type: ignore
+    except ImportError:
+        return None
+    tav = os.environ.get("TAVILY_API_KEY")
+    serp = os.environ.get("SERPAPI_KEY")
+    bing = os.environ.get("BING_SEARCH_KEY")
+    gkey, gcx = os.environ.get("GOOGLE_API_KEY"), os.environ.get("GOOGLE_CSE_ID")
+    try:
+        if tav:
+            r = requests.post("https://api.tavily.com/search",
+                              json={"api_key": tav, "query": query,
+                                    "max_results": num, "search_depth": "basic"},
+                              timeout=25)
+            r.raise_for_status()
+            return [(i.get("title", ""), i.get("url", ""))
+                    for i in r.json().get("results", [])[:num]]
+        if serp:
+            r = requests.get("https://serpapi.com/search.json",
+                             params={"q": query, "api_key": serp, "num": num,
+                                     "engine": "google"}, timeout=25)
+            r.raise_for_status()
+            return [(i.get("title", ""), i.get("link", ""))
+                    for i in r.json().get("organic_results", [])[:num]]
+        if bing:
+            r = requests.get("https://api.bing.microsoft.com/v7.0/search",
+                             headers={"Ocp-Apim-Subscription-Key": bing},
+                             params={"q": query, "count": num}, timeout=25)
+            r.raise_for_status()
+            return [(i.get("name", ""), i.get("url", ""))
+                    for i in r.json().get("webPages", {}).get("value", [])[:num]]
+        if gkey and gcx:
+            r = requests.get("https://www.googleapis.com/customsearch/v1",
+                             params={"key": gkey, "cx": gcx, "q": query,
+                                     "num": min(num, 10)}, timeout=25)
+            r.raise_for_status()
+            return [(i.get("title", ""), i.get("link", ""))
+                    for i in r.json().get("items", [])[:num]]
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! search failed for {query!r}: {e}", file=sys.stderr)
+        return []
+    return None  # no backend configured
+
+
+def discover(data: dict, existing_fairs: list[dict], curated_sources: dict,
+             force: bool, write: bool):
+    """Monthly-throttled discovery. Returns (state_or_None, new_candidates).
+    state_or_None is None when discovery did NOT run (throttled / no backend)."""
+    state = dict(data.get("discovery", {}) or {})
+    last = state.get("last_run")
+    if not force and last:
+        try:
+            gap = (TODAY - dt.date.fromisoformat(last)).days
+        except ValueError:
+            gap = DISCOVERY_INTERVAL_DAYS
+        if gap < DISCOVERY_INTERVAL_DAYS:
+            print(f"· discovery: last ran {last} ({gap}d ago) < "
+                  f"{DISCOVERY_INTERVAL_DAYS}d — skipping (monthly cadence)")
+            return None, []
+
+    targets = discovery_targets()
+    if not targets:
+        return None, []
+
+    known = {f["college"] for f in existing_fairs} | set(curated_sources)
+    searched = set(state.get("searched_colleges", []))
+    todo = [s for s in targets if s not in known and s not in searched]
+    if not todo:                       # full rotation done -> start over
+        searched = set()
+        todo = [s for s in targets if s not in known]
+
+    pending = _read_json(PENDING_PATH, [])
+    seen = {(p["college"], p["url"]) for p in pending}
+    new: list[dict] = []
+    budget = DISCOVERY_QUERY_BUDGET
+    for school in todo:
+        if budget <= 0:
+            break
+        query = f"{school} career fair 2026"
+        results = web_search(query)
+        if results is None:            # no backend -> don't mark state, retry later
+            print("  ! discovery: no search backend configured "
+                  "(set TAVILY_API_KEY / SERPAPI_KEY / BING_SEARCH_KEY / "
+                  "GOOGLE_API_KEY+GOOGLE_CSE_ID)")
+            return None, []
+        budget -= 1
+        searched.add(school)
+        for title, url in results:
+            if plausible_source(url) and (school, url) not in seen:
+                seen.add((school, url))
+                new.append({"college": school, "url": url, "title": title,
+                            "score": source_score(url),
+                            "query": query, "found": TODAY.isoformat(),
+                            "status": "pending_review"})
+
+    if write:
+        pending.extend(new)
+        # Best (most-likely-official) sources first within each school.
+        pending.sort(key=lambda p: (p["college"], -p.get("score", 0), p["url"]))
+        PENDING_PATH.write_text(
+            json.dumps(pending, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    state = {"last_run": TODAY.isoformat(), "searched_colleges": sorted(searched)}
+    return state, new
 
 
 # ----------------------------------------------------------------------------
@@ -278,28 +488,52 @@ def main() -> int:
                     help="scrape + report, but don't write files")
     ap.add_argument("--no-net", action="store_true",
                     help="skip network fetches (exercise merge/write path only)")
+    ap.add_argument("--no-discover", action="store_true",
+                    help="skip the web-search discovery step")
+    ap.add_argument("--force-discover", action="store_true",
+                    help="run discovery now even if <30 days since last run")
     args = ap.parse_args()
 
     data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
     existing = data.get("fairs", [])
-    print(f"Loaded {len(existing)} existing fairs from {JSON_PATH.name}")
+    curated = _read_json(SOURCES_PATH, {})     # {college: [approved urls]}
+    n_curated = sum(len(v) for v in curated.values())
+    print(f"Loaded {len(existing)} existing fairs; {n_curated} curated source URL(s)")
 
-    scraped = scrape(existing, use_net=not args.no_net)
+    # 1) SCRAPE (unchanged behavior) — known feed URLs + curated/approved URLs.
+    scraped = scrape(existing, curated, use_net=not args.no_net)
     merged, added = merge(existing, scraped)
-    merged, pruned = prune_past(merged)
+    merged, pruned = prune_stale(merged)
 
-    print(f"\n{len(added)} new fair(s) discovered:")
+    # 2) DISCOVERY (search API) — additive, monthly-throttled, review-only.
+    disc_state, disc_new = (None, [])
+    if not args.no_discover and not args.no_net:
+        disc_state, disc_new = discover(data, existing, curated,
+                                        force=args.force_discover,
+                                        write=not args.dry_run)
+
+    print(f"\n{len(added)} new fair(s) scraped:")
     for f in added:
         print(f"  + {f['college']} {f['date']} — {f['name']}")
     if pruned:
-        print(f"{pruned} past fair(s) pruned from the feed.")
+        print(f"{pruned} stale past fair(s) pruned (kept 1 most-recent per school).")
+    if disc_new:
+        print(f"{len(disc_new)} candidate source(s) flagged for review in "
+              f"{PENDING_PATH.name} (NOT auto-added).")
+    if disc_state:
+        print(f"discovery ran; {len(disc_state['searched_colleges'])} school(s) "
+              f"searched cumulatively.")
 
     if args.dry_run:
         print("\n(--dry-run) no files written.")
         return 0
 
-    if not added and not pruned:
-        print("\nNothing new; file unchanged.")
+    # career_fairs.json changes if fairs changed OR discovery state advanced.
+    file_changed = bool(added or pruned) or disc_state is not None
+    if disc_state is not None:
+        data["discovery"] = disc_state
+    if not file_changed:
+        print("\nNothing new; career_fairs.json unchanged.")
         return 0
 
     data["last_scraped"] = TODAY.isoformat()

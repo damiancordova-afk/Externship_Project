@@ -139,6 +139,9 @@ TEMPLATE = r"""<!DOCTYPE html>
     .fair__loc { font-size:13px; color:var(--text-secondary); }
     .fair__src { font-size:13px; }
     .fair__src a { color:#2F6FB0; }
+    /* Recently-passed block: muted so it reads as history, not upcoming */
+    .fairs--past { opacity:0.7; }
+    .fairs--past .fair__date-m { color:var(--text-label); }
 
     .empty { padding:64px 24px; text-align:center; color:var(--text-secondary); font-size:15px; }
 
@@ -284,6 +287,12 @@ TEMPLATE = r"""<!DOCTYPE html>
       return (s.fairs || []).filter(f => f.date >= TODAY_ISO)
                             .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
     }
+    // Single most-recently-passed fair (max 1), recomputed live against today.
+    function recentPastFair(s) {
+      const past = (s.fairs || []).filter(f => f.date < TODAY_ISO)
+                                  .sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
+      return past[0] || null;
+    }
     function fmtDate(iso) {
       const [y, m, d] = iso.split("-").map(Number);
       return new Date(y, m - 1, d).toLocaleDateString("en-US",
@@ -424,6 +433,33 @@ TEMPLATE = r"""<!DOCTYPE html>
 
       modalBody.textContent = "";
 
+      // Build a single .fair row element (shared by upcoming + passed).
+      function fairRow(f) {
+        const [y, m, d] = f.date.split("-").map(Number);
+        const row = document.createElement("div"); row.className = "fair";
+        const dbox = document.createElement("div"); dbox.className = "fair__date";
+        const mm = document.createElement("div"); mm.className = "fair__date-m";
+        mm.textContent = new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short" });
+        const dd = document.createElement("div"); dd.className = "fair__date-d"; dd.textContent = d;
+        const yy = document.createElement("div"); yy.className = "fair__date-y"; yy.textContent = y;
+        dbox.appendChild(mm); dbox.appendChild(dd); dbox.appendChild(yy);
+        const body = document.createElement("div"); body.className = "fair__body";
+        const fn = document.createElement("div"); fn.className = "fair__name"; fn.textContent = f.name;
+        body.appendChild(fn);
+        if (f.location) {
+          const lc = document.createElement("div"); lc.className = "fair__loc"; lc.textContent = f.location;
+          body.appendChild(lc);
+        }
+        if (f.source) {
+          const sc = document.createElement("div"); sc.className = "fair__src";
+          const a = document.createElement("a"); a.href = f.source; a.target = "_blank";
+          a.rel = "noopener"; a.textContent = "Source / register";
+          sc.appendChild(a); body.appendChild(sc);
+        }
+        row.appendChild(dbox); row.appendChild(body);
+        return row;
+      }
+
       // Upcoming career fairs (recomputed against today).
       const fairs = upcomingFairs(s);
       if (fairs.length) {
@@ -431,32 +467,18 @@ TEMPLATE = r"""<!DOCTYPE html>
         const t = document.createElement("p"); t.className = "fairs__title";
         t.textContent = `Upcoming career fair${fairs.length === 1 ? "" : "s"} (${fairs.length})`;
         wrap.appendChild(t);
-        fairs.forEach(f => {
-          const [y, m, d] = f.date.split("-").map(Number);
-          const row = document.createElement("div"); row.className = "fair";
-          const dbox = document.createElement("div"); dbox.className = "fair__date";
-          const mm = document.createElement("div"); mm.className = "fair__date-m";
-          mm.textContent = new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short" });
-          const dd = document.createElement("div"); dd.className = "fair__date-d"; dd.textContent = d;
-          const yy = document.createElement("div"); yy.className = "fair__date-y"; yy.textContent = y;
-          dbox.appendChild(mm); dbox.appendChild(dd); dbox.appendChild(yy);
+        fairs.forEach(f => wrap.appendChild(fairRow(f)));
+        modalBody.appendChild(wrap);
+      }
 
-          const body = document.createElement("div"); body.className = "fair__body";
-          const fn = document.createElement("div"); fn.className = "fair__name"; fn.textContent = f.name;
-          body.appendChild(fn);
-          if (f.location) {
-            const lc = document.createElement("div"); lc.className = "fair__loc"; lc.textContent = f.location;
-            body.appendChild(lc);
-          }
-          if (f.source) {
-            const sc = document.createElement("div"); sc.className = "fair__src";
-            const a = document.createElement("a"); a.href = f.source; a.target = "_blank";
-            a.rel = "noopener"; a.textContent = "Source / register";
-            sc.appendChild(a); body.appendChild(sc);
-          }
-          row.appendChild(dbox); row.appendChild(body);
-          wrap.appendChild(row);
-        });
+      // Recently passed — at most ONE (the most recent), recomputed live.
+      const past = recentPastFair(s);
+      if (past) {
+        const wrap = document.createElement("div"); wrap.className = "fairs fairs--past";
+        const t = document.createElement("p"); t.className = "fairs__title";
+        t.textContent = "Recently passed";
+        wrap.appendChild(t);
+        wrap.appendChild(fairRow(past));
         modalBody.appendChild(wrap);
       }
       if (!s.hires.length) {

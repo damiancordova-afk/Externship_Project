@@ -32,17 +32,27 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Scrape and merge new fairs
+      - name: Scrape fairs + monthly discovery
+        # Scraping runs every week. The discovery step self-throttles to ~monthly
+        # and only does anything when a search-API key is present. Any of these
+        # secrets works; missing ones are simply empty (discovery no-ops).
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          BING_SEARCH_KEY: ${{ secrets.BING_SEARCH_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
         run: python scripts/scrape_fairs.py
 
       - name: Commit changes if any
         run: |
-          if [[ -n "$(git status --porcelain career_fairs.json)" ]]; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add career_fairs.json
-            git commit -m "chore: refresh career-fair dates (automated scrape)"
-            git push
-          else
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add career_fairs.json
+          [ -f fair_sources_pending.json ] && git add fair_sources_pending.json || true
+          [ -f fair_sources.json ] && git add fair_sources.json || true
+          if git diff --cached --quiet; then
             echo "No changes to commit."
+          else
+            git commit -m "chore: refresh career fairs + discovery candidates (automated)"
+            git push
           fi
