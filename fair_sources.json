@@ -2,113 +2,845 @@
   "Brown University": [
     {
       "url": "https://events.brown.edu/live/events/323260-2026-startup-career-fair-virtual",
-      "render": true
+      "render": false
     },
     {
       "url": "https://ibes.brown.edu/climate-career-fair",
-      "render": true
+      "render": false
     },
     {
       "url": "https://planetary-health.brown.edu/event/climate-career-fair-march-5-2026",
-      "render": true
+      "render": false
     }
   ],
   "California Institute of Technology": [
     {
       "url": "https://career.caltech.edu/events",
-      "render": true
+      "render": false
     },
     {
       "url": "https://career.caltech.edu/employers/career-fairs-for-employers",
-      "render": true
+      "render": false
     },
     {
       "url": "https://calendar.ucsd.edu/event/fall-2026-career-fair",
-      "render": true
+      "render": false
     }
   ],
   "Columbia University": [
     {
       "url": "https://careerdesignlab.sps.columbia.edu/career-networking-expo",
-      "render": true
+      "render": false
     },
     {
       "url": "https://www.publichealth.columbia.edu/become-student/career-services/employers/career-day",
-      "render": true
+      "render": false
     },
     {
       "url": "https://gocolumbia.edu/career_job_placement_services/career_events.html",
-      "render": true
+      "render": false
     }
   ],
   "Cornell University": [
     {
       "url": "https://career.cornell.edu/events/2026/09/15/2026-cornell-career-fair-days",
-      "render": true
+      "render": false
     },
     {
       "url": "https://career.cornell.edu/recruiting-at-cornell-career-fairs",
-      "render": true
+      "render": false
     },
     {
       "url": "https://career.cornell.edu/videos/preparing-for-career-fairs",
-      "render": true
+      "render": false
     }
   ],
   "Harvard University": [
     {
       "url": "https://careerservices.fas.harvard.edu/events",
-      "render": true
+      "render": false
     },
     {
       "url": "https://careerservices.fas.harvard.edu/resources/data-analytics-science-technology-fair",
-      "render": true
+      "render": false
     },
     {
       "url": "https://careerservices.fas.harvard.edu/resources/startup-career-fair",
-      "render": true
+      "render": false
     }
   ],
   "Northwestern University": [
     {
       "url": "https://www.nmc.edu/student-services/advising-center/career-fair",
-      "render": true
+      "render": false
     },
     {
       "url": "https://www.northwestern.edu/careers/programs-opportunities/career-fairs-at-northwestern.html",
-      "render": true
+      "render": false
     },
     {
       "url": "https://www.northwestern.edu/recruit/recruit-at-northwestern/participate-in-career-fairs.html",
-      "render": true
+      "render": false
     }
   ],
   "Stanford University": [
     {
       "url": "https://qfarm.stanford.edu/events/conference-workshop/2026-27-quantum-career-fair",
-      "render": true
+      "render": false
     },
     {
       "url": "https://careered.stanford.edu/career-fairs",
-      "render": true
+      "render": false
     },
     {
       "url": "https://careered.stanford.edu/careerfairs",
-      "render": true
+      "render": false
     }
   ],
   "University of California, Los Angeles": [
     {
       "url": "https://career.ucla.edu/events",
-      "render": true
+      "render": false
     },
     {
       "url": "https://career.ucla.edu",
-      "render": true
+      "render": false
     },
     {
       "url": "https://careers.usc.edu/fall-career-fair",
-      "render": true
+      "render": false
+    }
+  ],
+  "Massachusetts Institute of Technology": [
+    {
+      "url": "https://careers.mit.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.mit.edu/hq/events",
+      "render": false
+    }
+  ],
+  "Yale University": [
+    {
+      "url": "https://careers.yale.edu/events",
+      "render": false
+    }
+  ],
+  "Dartmouth College": [
+    {
+      "url": "https://careers.dartmouth.edu",
+      "render": false
+    },
+    {
+      "url": "https://home.dartmouth.edu/events",
+      "render": false
+    }
+  ],
+  "University of California, Berkeley": [
+    {
+      "url": "https://career.berkeley.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.berkeley.edu/start-exploring/events/",
+      "render": false
+    },
+    {
+      "url": "https://career.berkeley.edu/find-opportunities/career-fairs/",
+      "render": false
+    }
+  ],
+  "Emory University": [
+    {
+      "url": "https://career.emory.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://cpd.emory.edu/channels/fairs-interviews-info-sessions/",
+      "render": false
+    },
+    {
+      "url": "https://cpd.emory.edu/events/",
+      "render": false
+    }
+  ],
+  "Georgetown University": [
+    {
+      "url": "https://careers.georgetown.edu",
+      "render": false
+    }
+  ],
+  "University of North Carolina at Chapel Hill": [
+    {
+      "url": "https://careers.unc.edu",
+      "render": false
+    },
+    {
+      "url": "https://www.unc.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://careers.unc.edu/resource/career-fairs-unc/",
+      "render": false
+    }
+  ],
+  "University of Southern California": [
+    {
+      "url": "https://careers.usc.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.usc.edu/events/?ctag%5B%5D=workshop&ctag%5B%5D=trojan-talks",
+      "render": false
+    },
+    {
+      "url": "https://careers.usc.edu/channels/explore-events/",
+      "render": false
+    }
+  ],
+  "University of California, San Diego": [
+    {
+      "url": "https://career.ucsd.edu/events",
+      "render": false
+    }
+  ],
+  "New York University": [
+    {
+      "url": "https://nyu.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://events.nyu.edu",
+      "render": false
+    }
+  ],
+  "University of Florida": [
+    {
+      "url": "https://career.ufl.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careerhub.ufl.edu/resources/industry-connections/",
+      "render": false
+    },
+    {
+      "url": "https://careerhub.ufl.edu/events/",
+      "render": false
+    }
+  ],
+  "University of California, Davis": [
+    {
+      "url": "https://ucdavis.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://ucdavis.edu/admissions/undergraduate/events",
+      "render": false
+    },
+    {
+      "url": "https://ucdavis.edu/admissions/undergraduate/events/discover",
+      "render": false
+    }
+  ],
+  "University of California, Irvine": [
+    {
+      "url": "https://career.uci.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.uci.edu/undergraduate/find-a-job/career-fairs/",
+      "render": false
+    },
+    {
+      "url": "https://career.uci.edu/about/events/",
+      "render": false
+    }
+  ],
+  "Georgia Institute of Technology": [
+    {
+      "url": "https://career.gatech.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.gatech.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://career.gatech.edu/career-fair/",
+      "render": false
+    }
+  ],
+  "University of California, Santa Barbara": [
+    {
+      "url": "https://career.ucsb.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://ucsb.joinhandshake.com/edu/events/1944406?lor=0&utm_source=mass_mailer&utm_medium=email&utm_campaign=uni_targeted_emails",
+      "render": false
+    }
+  ],
+  "Boston College": [
+    {
+      "url": "https://bc.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://bc.edu/content/bc-web/offices/studentaffairs/sites/careers/connect/career-fairs.html",
+      "render": false
+    },
+    {
+      "url": "https://bc.edu/content/bc-web/offices/studentaffairs/sites/careers/events.html",
+      "render": false
+    }
+  ],
+  "Rutgers University": [
+    {
+      "url": "https://careers.rutgers.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.rutgers.edu/events/workshops",
+      "render": false
+    }
+  ],
+  "Tufts University": [
+    {
+      "url": "https://careers.tufts.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://app.joinhandshake.com/career_fairs/5fe0adf1-cfc1-44f2-90a3-b930dd9a3388/employer_preview",
+      "render": false
+    },
+    {
+      "url": "https://careers.tufts.edu/events/",
+      "render": false
+    }
+  ],
+  "University of Washington": [
+    {
+      "url": "https://careers.uw.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.uw.edu/events/student/",
+      "render": false
+    },
+    {
+      "url": "https://careers.uw.edu/career-fairs/",
+      "render": false
+    }
+  ],
+  "Boston University": [
+    {
+      "url": "https://careers.bu.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.bu.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://careers.bu.edu/events/2026/08/",
+      "render": false
+    }
+  ],
+  "Purdue University": [
+    {
+      "url": "https://careers.purdue.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.purdue.edu/events?locale=en_US",
+      "render": false
+    }
+  ],
+  "University of Georgia": [
+    {
+      "url": "https://uga.edu/career-services/events",
+      "render": false
+    },
+    {
+      "url": "https://georgiamuseum.org/events/",
+      "render": false
+    }
+  ],
+  "University of Maryland, College Park": [
+    {
+      "url": "https://career.umd.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.umd.edu/explore-careers/career-exposure",
+      "render": false
+    }
+  ],
+  "Wake Forest University": [
+    {
+      "url": "https://wfu.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://events.wfu.edu/",
+      "render": false
+    },
+    {
+      "url": "https://app.joinhandshake.com/stu/events",
+      "render": false
+    }
+  ],
+  "University of California, Santa Cruz": [
+    {
+      "url": "https://careers.ucsc.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.ucsc.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://events.ucsc.edu/event/life-after-graduation-series-post-grad-job-search-build-a-standout-resume-with-ai/",
+      "render": false
+    }
+  ],
+  "Virginia Tech": [
+    {
+      "url": "https://career.vt.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.vt.edu/resources/career-fairs/",
+      "render": false
+    },
+    {
+      "url": "https://career.vt.edu/events/",
+      "render": false
+    }
+  ],
+  "Michigan State University": [
+    {
+      "url": "https://careers.msu.edu",
+      "render": false
+    },
+    {
+      "url": "https://careers.msu.edu#CareerEvents",
+      "render": false
+    }
+  ],
+  "Florida State University": [
+    {
+      "url": "https://career.fsu.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.fsu.edu/students/undergraduate-students/job-fairs-and-events",
+      "render": false
+    },
+    {
+      "url": "https://career.fsu.edu/students/events-and-workshops",
+      "render": false
+    }
+  ],
+  "University of California, Riverside": [
+    {
+      "url": "https://careers.ucr.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.ucr.edu/employers/career-fairs",
+      "render": false
+    }
+  ],
+  "University of Connecticut": [
+    {
+      "url": "https://career.uconn.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.uconn.edu/events/default/",
+      "render": false
+    },
+    {
+      "url": "https://career.uconn.edu/resources/category/annual-career-fairs-events/",
+      "render": false
+    }
+  ],
+  "University of Miami": [
+    {
+      "url": "https://careers.miami.edu/events",
+      "render": false
+    }
+  ],
+  "Tulane University": [
+    {
+      "url": "https://career.tulane.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careerengagement.tulane.edu/events/2026/07/16/smart-job-search-strategies-linkedin-networking/",
+      "render": false
+    },
+    {
+      "url": "https://careerengagement.tulane.edu/events/2026/07/23/mastering-the-interview-process/",
+      "render": false
+    }
+  ],
+  "Southern Methodist University": [
+    {
+      "url": "https://career.smu.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.smu.edu/studentaffairs/hegi-career-center/employer-relations/career-fair",
+      "render": false
+    }
+  ],
+  "Rensselaer Polytechnic Institute": [
+    {
+      "url": "https://careers.rpi.edu/events",
+      "render": false
+    }
+  ],
+  "Clemson University": [
+    {
+      "url": "https://career.clemson.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.clemson.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://career.clemson.edu/events/2026/08/",
+      "render": false
+    }
+  ],
+  "Fordham University": [
+    {
+      "url": "https://fordham.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://fordham.edu/student-life/events-and-activities/",
+      "render": false
+    },
+    {
+      "url": "https://fordham.edu/resources/career-resources/career-center/for-employers/",
+      "render": false
+    }
+  ],
+  "Brigham Young University": [
+    {
+      "url": "https://careers.byu.edu",
+      "render": false
+    }
+  ],
+  "Arizona State University": [
+    {
+      "url": "https://careers.asu.edu",
+      "render": false
+    }
+  ],
+  "University of Delaware": [
+    {
+      "url": "https://careers.udel.edu/events",
+      "render": false
+    }
+  ],
+  "North Carolina State University": [
+    {
+      "url": "https://careers.ncsu.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.dasa.ncsu.edu/gain-experience/career-fairs/",
+      "render": false
+    },
+    {
+      "url": "https://careers.dasa.ncsu.edu/career-fair-plus-2/",
+      "render": false
+    }
+  ],
+  "University of Iowa": [
+    {
+      "url": "https://careers.uiowa.edu",
+      "render": false
+    },
+    {
+      "url": "https://careers.uiowa.edu/career-fairs",
+      "render": false
+    },
+    {
+      "url": "https://events.uiowa.edu/event/37156",
+      "render": false
+    }
+  ],
+  "University of Arizona": [
+    {
+      "url": "https://career.arizona.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.arizona.edu/2024-career-fairs/",
+      "render": false
+    },
+    {
+      "url": "https://career.arizona.edu/channels/careerdays/",
+      "render": false
+    }
+  ],
+  "Auburn University": [
+    {
+      "url": "https://career.auburn.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.auburn.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://career.auburn.edu/events/2026/08/",
+      "render": false
+    }
+  ],
+  "Loyola Marymount University": [
+    {
+      "url": "https://careers.lmu.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.lmu.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://careers.lmu.edu/events/employer-calendar/",
+      "render": false
+    }
+  ],
+  "University of Tennessee, Knoxville": [
+    {
+      "url": "https://career.utk.edu",
+      "render": false
+    },
+    {
+      "url": "https://studentsuccess.utk.edu/career/employers/job-fairs/",
+      "render": false
+    },
+    {
+      "url": "https://studentsuccess.utk.edu/career/job-fairs-week/",
+      "render": false
+    }
+  ],
+  "University of San Diego": [
+    {
+      "url": "https://sandiego.edu/careers",
+      "render": false
+    }
+  ],
+  "Yeshiva University": [
+    {
+      "url": "https://yu.edu/careers",
+      "render": false
+    }
+  ],
+  "Worcester Polytechnic Institute": [
+    {
+      "url": "https://careers.wpi.edu",
+      "render": false
+    }
+  ],
+  "University of Denver": [
+    {
+      "url": "https://career.du.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.du.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://career.du.edu/events/2026/08/",
+      "render": false
+    }
+  ],
+  "Rochester Institute of Technology": [
+    {
+      "url": "https://careers.rit.edu",
+      "render": false
+    },
+    {
+      "url": "https://www.rit.edu/events/",
+      "render": false
+    }
+  ],
+  "Colgate University": [
+    {
+      "url": "https://careers.colgate.edu",
+      "render": false
+    }
+  ],
+  "Ithaca College": [
+    {
+      "url": "https://careers.ithaca.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://events.ithaca.edu",
+      "render": false
+    }
+  ],
+  "Le Moyne College": [
+    {
+      "url": "https://lemoyne.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://www.lemoyne.edu/events/?category[]=career",
+      "render": false
+    },
+    {
+      "url": "https://www.lemoyne.edu/events/",
+      "render": false
+    }
+  ],
+  "Adelphi University": [
+    {
+      "url": "https://adelphi.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://adelphi.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://adelphi.edu/events/?filters[category]=career-and-professional-development",
+      "render": false
+    }
+  ],
+  "Hofstra University": [
+    {
+      "url": "https://hofstra.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://news.hofstra.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://events.hofstra.edu/",
+      "render": false
+    }
+  ],
+  "Rockefeller University": [
+    {
+      "url": "https://careers.rockefeller.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://c-13160-20230405-www-rockefeller-edu.i.icims.com/events-and-lectures/calendar/",
+      "render": false
+    },
+    {
+      "url": "https://www.rockefeller.edu/events-and-lectures/calendar/",
+      "render": false
+    }
+  ],
+  "Wells College": [
+    {
+      "url": "https://wells.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://www.wells.edu/academics/center-sustainability-environment/events/",
+      "render": false
+    }
+  ],
+  "Niagara University": [
+    {
+      "url": "https://niagara.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://www.niagara.edu/events/",
+      "render": false
+    }
+  ],
+  "San Francisco State University": [
+    {
+      "url": "https://career.sfsu.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.sfsu.edu/events-workshops-fairs",
+      "render": false
+    },
+    {
+      "url": "https://career.sfsu.edu/events/2023",
+      "render": false
+    }
+  ],
+  "California College of the Arts": [
+    {
+      "url": "https://cca.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://portal.cca.edu/events-calendar/",
+      "render": false
+    }
+  ],
+  "San Jose State University": [
+    {
+      "url": "https://sjsu.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://www.sjsu.edu/campus-life/events.php",
+      "render": false
+    }
+  ],
+  "University of Cincinnati": [
+    {
+      "url": "https://uc.edu/careers",
+      "render": false
+    },
+    {
+      "url": "https://uc.edu/about/admin-finance/purchasing/events---opportunities.html",
+      "render": false
+    },
+    {
+      "url": "https://uc.edu/about/admin-finance/planning-design-construction/sustainability/get-involved/events-&-programming.html",
+      "render": false
+    }
+  ],
+  "University of Rhode Island": [
+    {
+      "url": "https://career.uri.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://career.uri.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://career.uri.edu/events/2026/08/",
+      "render": false
+    }
+  ],
+  "University of Utah": [
+    {
+      "url": "https://careers.utah.edu/events",
+      "render": false
+    },
+    {
+      "url": "https://careers.utah.edu/events/",
+      "render": false
+    },
+    {
+      "url": "https://careers.utah.edu/employers/career-fairs/",
+      "render": false
     }
   ]
 }
