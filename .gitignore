@@ -8,3 +8,6 @@ campus-recruiting-directory.html
 __pycache__/
 *.pyc
 .venv/
+
+# Current-employee roster (employee PII)
+current_employees.json

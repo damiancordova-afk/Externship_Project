@@ -78,6 +78,46 @@ TEMPLATE = r"""<!DOCTYPE html>
     .pill:hover { border-color:var(--border-hover); }
     .pill[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--white); }
 
+    /* Search + Filters button row */
+    .search-row { display:flex; gap:8px; align-items:stretch; position:relative; }
+    .search-row .search { flex:1; }
+    .filters-btn { display:inline-flex; align-items:center; gap:8px; height:48px;
+      padding:0 16px; border:1px solid var(--border-soft); border-radius:var(--radius-input);
+      background:var(--white); color:var(--ink); font-family:var(--font-sans); font-size:15px;
+      cursor:pointer; white-space:nowrap; transition:border-color var(--ease); }
+    .filters-btn:hover { border-color:var(--border-hover); }
+    .filters-btn svg { width:18px; height:18px; }
+    .filters-btn__count { background:var(--ink); color:var(--white); font-size:12px;
+      min-width:18px; height:18px; border-radius:9px; display:inline-grid; place-items:center; padding:0 5px; }
+
+    /* Filters popup */
+    .filter-popup { position:absolute; top:calc(100% + 8px); right:0; z-index:40;
+      width:min(360px, 92vw); background:var(--white); border:1px solid var(--border-soft);
+      border-radius:var(--radius-card); box-shadow:var(--shadow-menu); padding:20px; }
+    .filter-popup[hidden] { display:none; }
+    .filter-popup__section { margin-bottom:20px; }
+    .filter-popup__section:last-of-type { margin-bottom:12px; }
+    .filter-popup__title { font-size:12px; text-transform:uppercase; letter-spacing:0.6px;
+      color:var(--text-label); margin:0 0 10px; }
+    .filter-field { display:flex; align-items:center; justify-content:space-between;
+      gap:12px; font-size:14px; color:var(--text-body); margin-bottom:8px; }
+    .filter-input { height:36px; border:1px solid var(--border-soft); border-radius:var(--radius-input);
+      background:var(--white); padding:4px 10px; font-family:var(--font-sans); font-size:14px;
+      color:var(--ink); transition:border-color var(--ease); }
+    .filter-input:hover { border-color:var(--border-hover); }
+    .filter-input--num { width:80px; }
+    .filter-daterange { display:flex; gap:12px; }
+    .filter-daterange .filter-field { flex:1; flex-direction:column; align-items:flex-start; gap:4px; }
+    .filter-daterange .filter-input { width:100%; }
+    .filter-popup__actions { display:flex; justify-content:space-between; gap:8px; }
+    .fbtn { height:40px; padding:0 16px; border-radius:var(--radius-input); border:none;
+      font-family:var(--font-sans); font-size:14px; cursor:pointer; transition:background var(--ease); }
+    .fbtn--secondary { background:rgba(35,24,16,0.08); color:var(--ink); }
+    .fbtn--secondary:hover { background:rgba(35,24,16,0.16); }
+    .fbtn--primary { background:var(--ink); color:var(--white); }
+    .fbtn--primary:hover { background:rgba(35,24,16,0.9); }
+    @media (max-width:480px) { .filter-popup { right:auto; left:0; } }
+
     .result-count { margin:0 0 16px; font-size:13px; color:var(--text-secondary); }
 
     /* Table */
@@ -158,6 +198,9 @@ TEMPLATE = r"""<!DOCTYPE html>
     .modal__meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap;
       font-size:14px; color:var(--text-secondary); }
     .modal__body { overflow-y:auto; padding:8px 32px 32px; }
+    .hire-group { margin-bottom:16px; }
+    .hire-group__title { font-size:12px; text-transform:uppercase; letter-spacing:0.6px;
+      color:var(--text-label); margin:16px 0 4px; }
     .hire { padding:16px 0; border-bottom:1px solid var(--divider); }
     .hire:last-child { border-bottom:none; }
     .hire__name { font-size:16px; margin-bottom:8px; }
@@ -223,21 +266,61 @@ TEMPLATE = r"""<!DOCTYPE html>
     </section>
 
     <div class="controls">
-      <div class="search">
-        <svg class="search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
-        </svg>
-        <input id="search" type="search" placeholder="Search by school name..."
-          autocomplete="off" aria-label="Search by school name" />
-      </div>
-      <div class="filters" role="group" aria-label="Filter schools">
-        <span class="filters__label">Show</span>
-        <button class="pill" type="button" data-filter="fair" aria-pressed="false">Upcoming career fair</button>
-        <button class="pill" type="button" data-filter="hired" aria-pressed="false">Has hires</button>
-        <button class="pill" type="button" data-filter="ranked" aria-pressed="false">Top 100</button>
-        <button class="pill" type="button" data-filter="ny" aria-pressed="false">New York</button>
-        <button class="pill" type="button" data-filter="sf" aria-pressed="false">San Francisco</button>
+      <div class="search-row">
+        <div class="search">
+          <svg class="search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+          </svg>
+          <input id="search" type="search" placeholder="Search by school name..."
+            autocomplete="off" aria-label="Search by school name" />
+        </div>
+        <button class="filters-btn" id="filtersBtn" type="button" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 5h18M6 12h12M10 19h4"/>
+          </svg>
+          Filters
+          <span class="filters-btn__count" id="filterCount" hidden>0</span>
+        </button>
+
+        <div class="filter-popup" id="filterPopup" role="dialog" aria-label="Filters" hidden>
+          <div class="filter-popup__section">
+            <p class="filter-popup__title">Show only schools that have…</p>
+            <div class="filters" role="group" aria-label="Category filters">
+              <button class="pill" type="button" data-filter="current" aria-pressed="false">Current employees</button>
+              <button class="pill" type="button" data-filter="hired" aria-pressed="false">Any hires</button>
+              <button class="pill" type="button" data-filter="fair" aria-pressed="false">Upcoming career fair</button>
+              <button class="pill" type="button" data-filter="ranked" aria-pressed="false">Top 100</button>
+              <button class="pill" type="button" data-filter="ny" aria-pressed="false">New York</button>
+              <button class="pill" type="button" data-filter="sf" aria-pressed="false">San Francisco</button>
+            </div>
+          </div>
+          <div class="filter-popup__section">
+            <p class="filter-popup__title">Minimum counts</p>
+            <label class="filter-field">Min current employees
+              <input id="minCurrent" class="filter-input filter-input--num" type="number" min="0" placeholder="0" />
+            </label>
+            <label class="filter-field">Min hires
+              <input id="minHires" class="filter-input filter-input--num" type="number" min="0" placeholder="0" />
+            </label>
+          </div>
+          <div class="filter-popup__section">
+            <p class="filter-popup__title">Career fair date</p>
+            <div class="filter-daterange">
+              <label class="filter-field">From
+                <input id="fairFrom" class="filter-input" type="date" />
+              </label>
+              <label class="filter-field">To
+                <input id="fairTo" class="filter-input" type="date" />
+              </label>
+            </div>
+          </div>
+          <div class="filter-popup__actions">
+            <button class="fbtn fbtn--secondary" id="clearFilters" type="button">Clear all</button>
+            <button class="fbtn fbtn--primary" id="doneFilters" type="button">Done</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -304,17 +387,33 @@ TEMPLATE = r"""<!DOCTYPE html>
     const countEl = document.getElementById("resultCount");
 
     let query = "";
-    const active = new Set();
+    const active = new Set();          // category toggles
+    let minCurrent = 0, minHires = 0;  // minimum counts
+    let fairFrom = "", fairTo = "";    // career-fair date range (ISO)
+
+    function currentCount(s) { return (s.hires || []).filter(h => h.current).length; }
 
     function matches(s) {
       const q = query.trim().toLowerCase();
       if (q && !s.name.toLowerCase().includes(q)) return false;
       for (const f of active) {
-        // "fair" is recomputed live against today, not the static build-time tag.
         if (f === "fair") { if (!upcomingFairs(s).length) return false; }
+        else if (f === "current") { if (currentCount(s) < 1) return false; }
         else if (!s.criteria.includes(f)) return false;
       }
+      if (minCurrent > 0 && currentCount(s) < minCurrent) return false;
+      if (minHires > 0 && s.count < minHires) return false;
+      if (fairFrom || fairTo) {
+        const inRange = (s.fairs || []).some(fr =>
+          (!fairFrom || fr.date >= fairFrom) && (!fairTo || fr.date <= fairTo));
+        if (!inRange) return false;
+      }
       return true;
+    }
+
+    function activeFilterCount() {
+      return active.size + (minCurrent > 0 ? 1 : 0) + (minHires > 0 ? 1 : 0)
+             + ((fairFrom || fairTo) ? 1 : 0);
     }
 
     function tag(kind) {
@@ -493,7 +592,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           + (parts.join(" and ") || "in scope") + ".";
         modalBody.appendChild(e);
       } else {
-        s.hires.forEach(h => {
+        const hireRow = (h) => {
           const row = document.createElement("div"); row.className = "hire";
           const nm = document.createElement("div"); nm.className = "hire__name";
           nm.textContent = h.name || "(name unavailable)";
@@ -507,8 +606,20 @@ TEMPLATE = r"""<!DOCTYPE html>
             none.className = "hire__none"; none.textContent = "No contact info available";
             row.appendChild(none);
           }
-          modalBody.appendChild(row);
-        });
+          return row;
+        };
+        const hireGroup = (title, list) => {
+          if (!list.length) return;
+          const g = document.createElement("div"); g.className = "hire-group";
+          const t = document.createElement("p"); t.className = "hire-group__title";
+          t.textContent = `${title} (${list.length})`;
+          g.appendChild(t);
+          list.forEach(h => g.appendChild(hireRow(h)));
+          modalBody.appendChild(g);
+        };
+        // Current employees first, then past hires.
+        hireGroup("Current Employees", s.hires.filter(h => h.current));
+        hireGroup("Past Hires", s.hires.filter(h => !h.current));
       }
       overlay.classList.add("open");
       document.getElementById("modalClose").focus();
@@ -521,17 +632,51 @@ TEMPLATE = r"""<!DOCTYPE html>
       if (e.key === "Escape" && overlay.classList.contains("open")) closeDetail();
     });
 
+    function updateFilterCount() {
+      const n = activeFilterCount();
+      const badge = document.getElementById("filterCount");
+      badge.textContent = n; badge.hidden = n === 0;
+    }
+    const rerender = () => { updateFilterCount(); render(); };
+
     document.getElementById("search").addEventListener("input", e => { query = e.target.value; render(); });
+
     document.querySelectorAll(".pill").forEach(p => {
       p.addEventListener("click", () => {
         const f = p.dataset.filter;
         const on = p.getAttribute("aria-pressed") === "true";
         p.setAttribute("aria-pressed", String(!on));
         if (on) active.delete(f); else active.add(f);
-        render();
+        rerender();
       });
     });
+    document.getElementById("minCurrent").addEventListener("input", e => { minCurrent = parseInt(e.target.value, 10) || 0; rerender(); });
+    document.getElementById("minHires").addEventListener("input", e => { minHires = parseInt(e.target.value, 10) || 0; rerender(); });
+    document.getElementById("fairFrom").addEventListener("input", e => { fairFrom = e.target.value; rerender(); });
+    document.getElementById("fairTo").addEventListener("input", e => { fairTo = e.target.value; rerender(); });
 
+    // Filters popup open/close
+    const popup = document.getElementById("filterPopup");
+    const fbtn = document.getElementById("filtersBtn");
+    function togglePopup(show) {
+      const open = show === undefined ? popup.hidden : show;
+      popup.hidden = !open;
+      fbtn.setAttribute("aria-expanded", String(open));
+    }
+    fbtn.addEventListener("click", e => { e.stopPropagation(); togglePopup(); });
+    popup.addEventListener("click", e => e.stopPropagation());
+    document.addEventListener("click", () => { if (!popup.hidden) togglePopup(false); });
+    document.getElementById("doneFilters").addEventListener("click", () => togglePopup(false));
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !popup.hidden) togglePopup(false); });
+
+    document.getElementById("clearFilters").addEventListener("click", () => {
+      active.clear(); minCurrent = 0; minHires = 0; fairFrom = ""; fairTo = "";
+      document.querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", "false"));
+      ["minCurrent", "minHires", "fairFrom", "fairTo"].forEach(id => document.getElementById(id).value = "");
+      rerender();
+    });
+
+    updateFilterCount();
     render();
   </script>
 </body>
