@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-07-13",
+  "last_scraped": "2026-07-20",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -177,6 +177,15 @@
       "date": "2026-10-27",
       "location": "Olive Walk",
       "source": "https://career.caltech.edu/events"
+    },
+    {
+      "college": "California Institute of Technology",
+      "name": "career fair, or host an info session.",
+      "date": "2026-11-05",
+      "location": "",
+      "source": "https://career.caltech.edu/events",
+      "auto": true,
+      "scraped_at": "2026-07-20"
     },
     {
       "college": "Carnegie Mellon University",
