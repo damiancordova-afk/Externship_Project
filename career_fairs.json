@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-07-20",
+  "last_scraped": "2026-07-27",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -123,6 +123,15 @@
       "scraped_at": "2026-07-10"
     },
     {
+      "college": "Boston University",
+      "name": "Career Fair Fall 2026 Thursday, October 1, 2026 12pm - 4pm Thu, Oct 1",
+      "date": "2026-10-01",
+      "location": "",
+      "source": "https://careers.bu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-07-27"
+    },
+    {
       "college": "Brandeis University",
       "name": "Brandeis Career & Internship Fair (Fall)",
       "date": "2026-09-24",
@@ -163,6 +172,15 @@
       "date": "2026-10-02",
       "location": "",
       "source": "https://career-center.brown.edu/info/employers/calendar"
+    },
+    {
+      "college": "California Institute of Technology",
+      "name": "career fair, or host an info session.",
+      "date": "2026-07-28",
+      "location": "",
+      "source": "https://career.caltech.edu/events",
+      "auto": true,
+      "scraped_at": "2026-07-27"
     },
     {
       "college": "California Institute of Technology",
@@ -283,6 +301,15 @@
       "source": "https://career.fsu.edu/employers/attend-a-career-fair",
       "auto": true,
       "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Florida State University",
+      "name": "career fairs. NEW this year: This is a hybrid event with both in-perso",
+      "date": "2026-09-17",
+      "location": "",
+      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
+      "auto": true,
+      "scraped_at": "2026-07-27"
     },
     {
       "college": "Florida State University",
@@ -1799,6 +1826,15 @@
       "source": "https://careers.utah.edu/employers/career-fairs/",
       "auto": true,
       "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "University of Utah",
+      "name": "Marketing & Communication Career Expo",
+      "date": "2026-10-28",
+      "location": "",
+      "source": "https://careers.utah.edu/employers/career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-07-27"
     },
     {
       "college": "University of Vermont",
