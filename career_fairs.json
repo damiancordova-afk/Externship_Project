@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-07-27",
+  "last_scraped": "2026-08-10",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -105,6 +105,24 @@
       "date": "2026-09-18",
       "location": "Innovative Technologies Complex",
       "source": "https://www.binghamton.edu/watson/student-services/career-connection/employers/watson-career-expo.html"
+    },
+    {
+      "college": "Boston University",
+      "name": "Career Fair Tuesday, September 1, 2026 3pm - 6pm Tue, Sep 1 from 3pm",
+      "date": "2026-09-01",
+      "location": "",
+      "source": "https://careers.bu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-08-10"
+    },
+    {
+      "college": "Boston University",
+      "name": "Career Fair - Day 2 Wednesday, September 2, 2026 7am - 10am Wed, Sep 2",
+      "date": "2026-09-02",
+      "location": "",
+      "source": "https://careers.bu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-08-10"
     },
     {
       "college": "Boston University",
@@ -367,6 +385,15 @@
       "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
       "auto": true,
       "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Georgia Institute of Technology",
+      "name": "Career Fair Date(s): September 16, 2026 Time: 10:00 AM – 2:00 PM Locat",
+      "date": "2026-09-16",
+      "location": "",
+      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-08-10"
     },
     {
       "college": "Georgia Institute of Technology",
