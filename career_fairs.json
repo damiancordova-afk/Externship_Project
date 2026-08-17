@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-08-10",
+  "last_scraped": "2026-08-17",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -945,6 +945,15 @@
     },
     {
       "college": "San Jose State University",
+      "name": "Internship Fair Wednesday, September 2, 2026 11am - 3pm Wed, Sep 2 fro",
+      "date": "2026-09-02",
+      "location": "",
+      "source": "https://careercenter.sjsu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-08-17"
+    },
+    {
+      "college": "San Jose State University",
       "name": "Fall STEM Undergrad Job/Internship Fair (Day 1)",
       "date": "2026-09-09",
       "location": "Student Union Ballroom",
@@ -1412,6 +1421,15 @@
       "source": "https://www.udel.edu/students/career/career-fairs/",
       "auto": true,
       "scraped_at": "2026-07-13"
+    },
+    {
+      "college": "University of Delaware",
+      "name": "Quantum, semiconductors, and photonics industry career fair (Q-SPIN) Friday,",
+      "date": "2026-10-30",
+      "location": "",
+      "source": "https://www.udel.edu/students/career/career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-08-17"
     },
     {
       "college": "University of Florida",
