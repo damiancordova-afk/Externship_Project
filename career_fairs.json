@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-08-17",
+  "last_scraped": "2026-08-24",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -301,15 +301,6 @@
       "date": "2026-09-17",
       "location": "",
       "source": "https://cpd.emory.edu/channels/stem/"
-    },
-    {
-      "college": "Florida State University",
-      "name": "Standard Registration Off-Campus Employers $75.00 FSU Departments Free The last",
-      "date": "2026-08-12",
-      "location": "",
-      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
-      "auto": true,
-      "scraped_at": "2026-07-10"
     },
     {
       "college": "Florida State University",
