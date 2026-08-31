@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-08-24",
+  "last_scraped": "2026-08-31",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -505,6 +505,15 @@
     },
     {
       "college": "Lehigh University",
+      "name": "Career Expo Prep Session for Graduate Students",
+      "date": "2026-09-09",
+      "location": "",
+      "source": "https://eventscalendar.lehigh.edu/event/career_expo_prep",
+      "auto": true,
+      "scraped_at": "2026-08-31"
+    },
+    {
+      "college": "Lehigh University",
       "name": "Virtual Fall Career Expo",
       "date": "2026-09-15",
       "location": "Virtual",
@@ -911,13 +920,6 @@
     },
     {
       "college": "San Jose State University",
-      "name": "Fall Part-Time & On-Campus Job Fair",
-      "date": "2026-08-19",
-      "location": "Student Union Ballroom",
-      "source": "https://careercenter.sjsu.edu/events/"
-    },
-    {
-      "college": "San Jose State University",
       "name": "Career fair",
       "date": "2026-08-27",
       "location": "",
@@ -942,6 +944,15 @@
       "source": "https://careercenter.sjsu.edu/events/",
       "auto": true,
       "scraped_at": "2026-08-17"
+    },
+    {
+      "college": "San Jose State University",
+      "name": "Job Fair Success Workshop at CV2 MPR/CB Tuesday, September 8, 2026 3pm",
+      "date": "2026-09-08",
+      "location": "",
+      "source": "https://careercenter.sjsu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-08-31"
     },
     {
       "college": "San Jose State University",
@@ -1305,6 +1316,15 @@
     },
     {
       "college": "University of Colorado Boulder",
+      "name": "Job and Internship Search Strategies Workshop",
+      "date": "2026-09-01",
+      "location": "Center for Community",
+      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
+      "auto": true,
+      "scraped_at": "2026-08-31"
+    },
+    {
+      "college": "University of Colorado Boulder",
       "name": "Civil, Environmental and Architectural Engineering Career & Internship Fair",
       "date": "2026-09-30",
       "location": "Glenn Miller Ballroom, UMC",
@@ -1449,6 +1469,15 @@
       "date": "2026-10-05",
       "location": "Classic Center",
       "source": "https://career.uga.edu/calendar/details/fall"
+    },
+    {
+      "college": "University of Georgia",
+      "name": "This event is designed to help students prepare for the Computer Science Career",
+      "date": "2026-10-06",
+      "location": "",
+      "source": "https://career.uga.edu/calendar/details/fall",
+      "auto": true,
+      "scraped_at": "2026-08-31"
     },
     {
       "college": "University of Illinois Urbana-Champaign",
