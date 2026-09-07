@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-08-31",
+  "last_scraped": "2026-09-07",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -105,15 +105,6 @@
       "date": "2026-09-18",
       "location": "Innovative Technologies Complex",
       "source": "https://www.binghamton.edu/watson/student-services/career-connection/employers/watson-career-expo.html"
-    },
-    {
-      "college": "Boston University",
-      "name": "Career Fair Tuesday, September 1, 2026 3pm - 6pm Tue, Sep 1 from 3pm",
-      "date": "2026-09-01",
-      "location": "",
-      "source": "https://careers.bu.edu/events/",
-      "auto": true,
-      "scraped_at": "2026-08-10"
     },
     {
       "college": "Boston University",
@@ -920,24 +911,6 @@
     },
     {
       "college": "San Jose State University",
-      "name": "Career fair",
-      "date": "2026-08-27",
-      "location": "",
-      "source": "https://careercenter.sjsu.edu/events/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "San Jose State University",
-      "name": "Career fair",
-      "date": "2026-09-01",
-      "location": "",
-      "source": "https://careercenter.sjsu.edu/events/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "San Jose State University",
       "name": "Internship Fair Wednesday, September 2, 2026 11am - 3pm Wed, Sep 2 fro",
       "date": "2026-09-02",
       "location": "",
@@ -960,6 +933,15 @@
       "date": "2026-09-09",
       "location": "Student Union Ballroom",
       "source": "https://careercenter.sjsu.edu/events/"
+    },
+    {
+      "college": "San Jose State University",
+      "name": "Internship Fair Day 2 Thursday, September 10, 2026 12pm - 4pm Thu, Sep",
+      "date": "2026-09-10",
+      "location": "",
+      "source": "https://careercenter.sjsu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-09-07"
     },
     {
       "college": "Southern Methodist University",
@@ -1322,6 +1304,24 @@
       "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
       "auto": true,
       "scraped_at": "2026-08-31"
+    },
+    {
+      "college": "University of Colorado Boulder",
+      "name": "Leeds Pre-Career Fair Workshop: Resumes, Networking, & Interviewing!",
+      "date": "2026-09-08",
+      "location": "Koelbel Building: Leeds School of Business",
+      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
+      "auto": true,
+      "scraped_at": "2026-09-07"
+    },
+    {
+      "college": "University of Colorado Boulder",
+      "name": "Leeds Fall 2026 Career Fair",
+      "date": "2026-09-09",
+      "location": "Limelight Hotel",
+      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
+      "auto": true,
+      "scraped_at": "2026-09-07"
     },
     {
       "college": "University of Colorado Boulder",
