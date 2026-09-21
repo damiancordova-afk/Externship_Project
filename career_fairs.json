@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-09-14",
+  "last_scraped": "2026-09-21",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -36,22 +36,6 @@
       "date": "2026-11-19",
       "location": "Memorial Union, Tempe Campus",
       "source": "https://career.eoss.asu.edu/channels/career-internship-fairs/"
-    },
-    {
-      "college": "Auburn University",
-      "name": "Interview Schedules for the Career Fair sessions will open to candidates on",
-      "date": "2026-08-17",
-      "location": "",
-      "source": "https://eng.auburn.edu/cdcr/employers/career-fairs-on-campus-interviewing.html",
-      "auto": true,
-      "scraped_at": "2026-07-13"
-    },
-    {
-      "college": "Auburn University",
-      "name": "Ginn College of Engineering Career Fair (Session 1)",
-      "date": "2026-09-14",
-      "location": "Brown-Kopel Engineering Student Achievement Center, Auburn, AL",
-      "source": "https://eng.auburn.edu/cdcr/employers/career-fairs-on-campus-interviewing.html"
     },
     {
       "college": "Auburn University",
@@ -91,13 +75,6 @@
       "date": "2026-09-25",
       "location": "Barnard College campus",
       "source": "https://barnard.edu/beyond-barnard/opportunities-conference"
-    },
-    {
-      "college": "Binghamton University",
-      "name": "Fall 2026 Job and Internship Fair",
-      "date": "2026-09-09",
-      "location": "University Union, Binghamton University",
-      "source": "https://www.binghamton.edu/ccpd/employers/job-fair.html"
     },
     {
       "college": "Binghamton University",
@@ -260,13 +237,6 @@
     },
     {
       "college": "Cornell University",
-      "name": "Fall Career Fair",
-      "date": "2026-09-16",
-      "location": "Barton Hall",
-      "source": "https://career.cornell.edu/channels/career-fairs/"
-    },
-    {
-      "college": "Cornell University",
       "name": "Engineering Career Fair",
       "date": "2026-09-18",
       "location": "Barton Hall",
@@ -292,15 +262,6 @@
       "date": "2026-09-17",
       "location": "",
       "source": "https://cpd.emory.edu/channels/stem/"
-    },
-    {
-      "college": "Florida State University",
-      "name": "The last day to cancel any part of your registration (full or add-ons) for the E",
-      "date": "2026-08-23",
-      "location": "",
-      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
-      "auto": true,
-      "scraped_at": "2026-07-10"
     },
     {
       "college": "Florida State University",
@@ -342,47 +303,6 @@
       "date": "2026-09-03",
       "location": "",
       "source": "https://careercenter.georgetown.edu/about-us/fall-career-fair/"
-    },
-    {
-      "college": "Georgia Institute of Technology",
-      "name": "Career fair",
-      "date": "2026-09-08",
-      "location": "",
-      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Georgia Institute of Technology",
-      "name": "All-Majors Career Fair (Fall)",
-      "date": "2026-09-14",
-      "location": "Campus Recreation Center (CRC)",
-      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/"
-    },
-    {
-      "college": "Georgia Institute of Technology",
-      "name": "Career fair",
-      "date": "2026-09-15",
-      "location": "",
-      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Georgia Institute of Technology",
-      "name": "Career Fair Date(s): September 16, 2026 Time: 10:00 AM – 2:00 PM Locat",
-      "date": "2026-09-16",
-      "location": "",
-      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-08-10"
-    },
-    {
-      "college": "Georgia Institute of Technology",
-      "name": "College of Computing (CoC) Career Fair",
-      "date": "2026-09-17",
-      "location": "McCamish Pavilion",
-      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/"
     },
     {
       "college": "Georgia Institute of Technology",
@@ -437,6 +357,15 @@
       "scraped_at": "2026-07-10"
     },
     {
+      "college": "Georgia Institute of Technology",
+      "name": "Georgia Association of Colleges and Employers (GACE) Statewide Career Fair Date(",
+      "date": "2026-10-21",
+      "location": "",
+      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-09-21"
+    },
+    {
       "college": "Harvard University",
       "name": "Technology, Science, & Data Fair",
       "date": "2026-10-02",
@@ -475,13 +404,6 @@
     },
     {
       "college": "Johns Hopkins University",
-      "name": "Future Fest 2026: Virtual STEM Career Fair",
-      "date": "2026-09-15",
-      "location": "Virtual",
-      "source": "https://imagine.jhu.edu/events/2026/09/15/future-fest-2026-hopkins-virtual-stem-career-fair/"
-    },
-    {
-      "college": "Johns Hopkins University",
       "name": "Future Fest 2026: Homewood Career Fair",
       "date": "2026-09-18",
       "location": "Ralph O'Connor Recreation Center, Homewood Campus",
@@ -493,15 +415,6 @@
       "date": "2026-10-20",
       "location": "Glass Pavilion, Homewood Campus",
       "source": "https://engineering.jhu.edu/case/career-fair/"
-    },
-    {
-      "college": "Lehigh University",
-      "name": "Career Expo Prep Session for Graduate Students",
-      "date": "2026-09-09",
-      "location": "",
-      "source": "https://eventscalendar.lehigh.edu/event/career_expo_prep",
-      "auto": true,
-      "scraped_at": "2026-08-31"
     },
     {
       "college": "Lehigh University",
@@ -547,20 +460,6 @@
     },
     {
       "college": "Michigan State University",
-      "name": "MSU Local Job and Internship Fair 2026",
-      "date": "2026-09-10",
-      "location": "509 Birch Road, East Lansing, MI",
-      "source": "https://careernetwork.msu.edu/events/category/career-fairs/"
-    },
-    {
-      "college": "Michigan State University",
-      "name": "MSU Engineering Career Fair 2026",
-      "date": "2026-09-15",
-      "location": "509 Birch Road, East Lansing, MI",
-      "source": "https://careernetwork.msu.edu/events/category/career-fairs/"
-    },
-    {
-      "college": "Michigan State University",
       "name": "Career Fair 2026 Tuesday, September 15, 2026 - Thursday, September 17,",
       "date": "2026-09-17",
       "location": "",
@@ -585,6 +484,15 @@
       "source": "https://careernetwork.msu.edu/events/category/career-fairs/",
       "auto": true,
       "scraped_at": "2026-09-14"
+    },
+    {
+      "college": "Michigan State University",
+      "name": "Career Fair Friday, October 2, 2026 10am - 1pm Fri, Oct 2 from 10am",
+      "date": "2026-10-02",
+      "location": "",
+      "source": "https://careernetwork.msu.edu/events/category/career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-09-21"
     },
     {
       "college": "New York Institute of Technology",
@@ -730,46 +638,21 @@
     },
     {
       "college": "Purdue University",
-      "name": "SIGMA INDUSTRIAL ENGINEERING VIRTUAL CAREER FAIR (",
-      "date": "2026-09-11",
-      "location": "",
-      "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Purdue University",
-      "name": "SIGMA INDUSTRIAL ENGINEERING IN PERSON CAREER FAIR (",
-      "date": "2026-09-14",
-      "location": "",
-      "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Purdue University",
-      "name": "Industrial Roundtable (In-Person)",
-      "date": "2026-09-15",
-      "location": "France A. Cordova Recreational Sports Center",
-      "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs"
-    },
-    {
-      "college": "Purdue University",
-      "name": "DANIELS SCHOOL STEM + BUSINESS CAREER CONNECT",
-      "date": "2026-09-16",
-      "location": "",
-      "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Purdue University",
       "name": "DANIELS SCHOOL OF BUSINESS FALL CAREER FAIR",
       "date": "2026-09-17",
       "location": "",
       "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
       "auto": true,
       "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "Purdue University",
+      "name": "PURDUE PUBLIC SERVICE CAREER FAIR",
+      "date": "2026-09-22",
+      "location": "",
+      "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
+      "auto": true,
+      "scraped_at": "2026-09-21"
     },
     {
       "college": "Purdue University",
@@ -825,13 +708,6 @@
     },
     {
       "college": "Rice University",
-      "name": "Career and Internship Expo - Day 1 (Engineering & Technology)",
-      "date": "2026-09-15",
-      "location": "Tudor Fieldhouse",
-      "source": "https://ccd.rice.edu/employers/expos-and-recruiting-events/expo"
-    },
-    {
-      "college": "Rice University",
       "name": "Career and Internship Expo - Day 2 (Business, Arts & Sciences)",
       "date": "2026-09-16",
       "location": "Tudor Fieldhouse",
@@ -850,31 +726,6 @@
       "date": "2026-10-08",
       "location": "RIT campus",
       "source": "https://rit-csm.symplicity.com/events/UWCF-FA24"
-    },
-    {
-      "college": "Rutgers University",
-      "name": "Career fair",
-      "date": "2026-09-04",
-      "location": "",
-      "source": "https://careers.rutgers.edu/events/career-internship-fairs",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Rutgers University",
-      "name": "Fall Career & Internship Mega Fair (Day 1)",
-      "date": "2026-09-15",
-      "location": "Jersey Mike's Arena, Piscataway",
-      "source": "https://careers.rutgers.edu/events/career-internship-fairs"
-    },
-    {
-      "college": "Rutgers University",
-      "name": "Career fair",
-      "date": "2026-09-16",
-      "location": "",
-      "source": "https://careers.rutgers.edu/events/career-internship-fairs",
-      "auto": true,
-      "scraped_at": "2026-07-10"
     },
     {
       "college": "Rutgers University",
@@ -929,15 +780,6 @@
     },
     {
       "college": "Southern Methodist University",
-      "name": "All Majors Career Fair Date Registration Opens Registration Closes Last Day to C",
-      "date": "2026-09-08",
-      "location": "",
-      "source": "https://www.smu.edu/studentaffairs/hegi-career-center/employer-relations/career-fair",
-      "auto": true,
-      "scraped_at": "2026-07-13"
-    },
-    {
-      "college": "Southern Methodist University",
       "name": "SMU All Majors Career and Internship Fair (Fall 2026)",
       "date": "2026-09-15",
       "location": "",
@@ -973,26 +815,10 @@
     },
     {
       "college": "Texas A&M University",
-      "name": "SEC Engineering Career Fair (Virtual)",
-      "date": "2026-09-11",
-      "location": "Hosted on HireAggies (Symplicity)",
-      "source": "https://www.careerfair.sec.tamu.edu/"
-    },
-    {
-      "college": "Texas A&M University",
       "name": "ASCE Career Fair (Civil Engineering)",
       "date": "2026-09-15",
       "location": "Zachry Engineering Education Complex",
       "source": "https://tamu-csm.symplicity.com/events/"
-    },
-    {
-      "college": "Texas Christian University",
-      "name": "Sales Career and Internship Fair Fall 2026",
-      "date": "2026-09-09",
-      "location": "Spencer Hays Hall, Spencer and Marlene Hays Business Commons",
-      "source": "https://calendar.tcu.edu/center_for_career_professional_development",
-      "auto": true,
-      "scraped_at": "2026-07-13"
     },
     {
       "college": "Texas Christian University",
@@ -1248,37 +1074,10 @@
     },
     {
       "college": "University of Cincinnati",
-      "name": "You may ship materials in advance, and your packages will be delivered to your c",
-      "date": "2026-09-11",
-      "location": "",
-      "source": "https://www.ccps.uc.edu/partners/career-fairs/professional-technical-fair.html",
-      "auto": true,
-      "scraped_at": "2026-07-13"
-    },
-    {
-      "college": "University of Cincinnati",
       "name": "Business, Engineering and IT Career Fair",
       "date": "2026-09-15",
       "location": "Campus Recreation Center / Tangeman University Center",
       "source": "https://www.ccps.uc.edu/partners/career-fairs/professional-technical-fair.html"
-    },
-    {
-      "college": "University of Colorado Boulder",
-      "name": "Leeds Fall 2026 Career Fair",
-      "date": "2026-09-09",
-      "location": "Limelight Hotel",
-      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
-      "auto": true,
-      "scraped_at": "2026-09-07"
-    },
-    {
-      "college": "University of Colorado Boulder",
-      "name": "Job and Internship Search Strategies Workshop",
-      "date": "2026-09-14",
-      "location": "",
-      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
-      "auto": true,
-      "scraped_at": "2026-09-14"
     },
     {
       "college": "University of Colorado Boulder",
@@ -1410,20 +1209,6 @@
     },
     {
       "college": "University of Florida",
-      "name": "Part-Time Job Fair",
-      "date": "2026-09-02",
-      "location": "UF campus",
-      "source": "https://ufl-csm.symplicity.com/events/upcoming"
-    },
-    {
-      "college": "University of Florida",
-      "name": "Career Week / Career Showcase (Non-Technical Day)",
-      "date": "2026-09-14",
-      "location": "Stephen C. O'Connell Center",
-      "source": "https://career.ufl.edu/employers/career-showcase/"
-    },
-    {
-      "college": "University of Florida",
       "name": "Career Week / Career Showcase (Technical Day)",
       "date": "2026-09-15",
       "location": "Stephen C. O'Connell Center",
@@ -1444,20 +1229,6 @@
       "source": "https://career.uga.edu/calendar/details/fall",
       "auto": true,
       "scraped_at": "2026-08-31"
-    },
-    {
-      "college": "University of Illinois Urbana-Champaign",
-      "name": "Grainger Engineering Fall Career Fair",
-      "date": "2026-09-09",
-      "location": "State Farm Center",
-      "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair"
-    },
-    {
-      "college": "University of Illinois Urbana-Champaign",
-      "name": "CEE Fall Job Fair",
-      "date": "2026-09-15",
-      "location": "Illini Union",
-      "source": "https://cee.illinois.edu/student-life/career-prep/job-fair-cee-students"
     },
     {
       "college": "University of Illinois Urbana-Champaign",
@@ -1621,13 +1392,6 @@
     },
     {
       "college": "University of Michigan",
-      "name": "Fall Job & Internship Fair (Day 1)",
-      "date": "2026-09-09",
-      "location": "Michigan Union",
-      "source": "https://careercenter.umich.edu/content/job-and-internship-fairs"
-    },
-    {
-      "college": "University of Michigan",
       "name": "Fall Job & Internship Fair (Days 2-3)",
       "date": "2026-09-14",
       "location": "Michigan Union",
@@ -1681,13 +1445,6 @@
       "date": "2026-09-24",
       "location": "Nebraska Union",
       "source": "https://careers.unl.edu/upcoming-fairs-events/university-career-internship-fair-employer-details/"
-    },
-    {
-      "college": "University of North Carolina at Chapel Hill",
-      "name": "Fall Jobs & Internships Career Fair (Day 1)",
-      "date": "2026-09-16",
-      "location": "Carolina Club",
-      "source": "https://careers.unc.edu/resource/career-fairs-unc/"
     },
     {
       "college": "University of North Carolina at Chapel Hill",
@@ -1802,13 +1559,6 @@
       "date": "2026-08-26",
       "location": "UTSA Student Union",
       "source": "https://careercenter.utsa.edu/events/part-time.html"
-    },
-    {
-      "college": "University of Utah",
-      "name": "Part Time and On-Campus Job Fair",
-      "date": "2026-08-26",
-      "location": "A. Ray Olpin Student Union",
-      "source": "https://careers.utah.edu/employers/career-fairs/"
     },
     {
       "college": "University of Utah",
@@ -1941,13 +1691,6 @@
     },
     {
       "college": "Virginia Tech",
-      "name": "Campus Student Employment Fair (Fall 2026)",
-      "date": "2026-08-31",
-      "location": "Smith Career Center",
-      "source": "https://career.vt.edu/events/2026/08/31/campus-student-employment-fair-fall-2026/"
-    },
-    {
-      "college": "Virginia Tech",
       "name": "Engineering Expo (SEC)",
       "date": "2026-09-15",
       "location": "Virginia Tech campus",
@@ -2003,13 +1746,6 @@
       "date": "2026-09-25",
       "location": "Sadler Center",
       "source": "https://www.wm.edu/offices/career/employers/recruiting-events/"
-    },
-    {
-      "college": "Worcester Polytechnic Institute",
-      "name": "WPI Fall 2026 2-Day Career Fair",
-      "date": "2026-09-16",
-      "location": "Worcester, MA (WPI campus)",
-      "source": "https://cdc.wpi.edu/events/2026/09/16/wpi-fall-2026-2-day-career-fair/"
     },
     {
       "college": "Worcester Polytechnic Institute",
