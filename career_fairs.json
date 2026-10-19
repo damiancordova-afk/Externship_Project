@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-10-12",
+  "last_scraped": "2026-10-19",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -61,6 +61,15 @@
       "scraped_at": "2026-10-05"
     },
     {
+      "college": "Boston University",
+      "name": "Career Fair Wednesday, October 21, 2026 11am - 3pm Wed, Oct 21 from 11",
+      "date": "2026-10-21",
+      "location": "",
+      "source": "https://careers.bu.edu/events/",
+      "auto": true,
+      "scraped_at": "2026-10-19"
+    },
+    {
       "college": "Brandeis University",
       "name": "Brandeis Career & Internship Fair (Fall)",
       "date": "2026-09-24",
@@ -90,19 +99,19 @@
     },
     {
       "college": "California Institute of Technology",
-      "name": "career fair, or host an info session.",
-      "date": "2026-10-05",
-      "location": "",
-      "source": "https://career.caltech.edu/events",
-      "auto": true,
-      "scraped_at": "2026-10-05"
-    },
-    {
-      "college": "California Institute of Technology",
       "name": "CMS-EE Partners Program Techfest Fall 2026",
       "date": "2026-10-15",
       "location": "Moore Walk",
       "source": "https://cms-ee-partners.caltech.edu/techfest"
+    },
+    {
+      "college": "California Institute of Technology",
+      "name": "career fair, or host an info session.",
+      "date": "2026-10-20",
+      "location": "",
+      "source": "https://career.caltech.edu/events",
+      "auto": true,
+      "scraped_at": "2026-10-19"
     },
     {
       "college": "California Institute of Technology",
@@ -386,24 +395,10 @@
     },
     {
       "college": "Northeastern University",
-      "name": "Talent Connect Career Fair - STEM & Sustainability",
-      "date": "2026-10-15",
-      "location": "Cabot Physical Education Center, 400 Huntington Ave, Boston",
-      "source": "https://careers.northeastern.edu/talent-connect-career-fair/"
-    },
-    {
-      "college": "Northeastern University",
       "name": "Talent Connect Career Fair - Virtual (all disciplines)",
       "date": "2026-10-16",
       "location": "Virtual",
       "source": "https://careers.northeastern.edu/talent-connect-career-fair/"
-    },
-    {
-      "college": "Northwestern University",
-      "name": "Tech Career Fair",
-      "date": "2026-09-30",
-      "location": "",
-      "source": "https://www.mccormick.northwestern.edu/career-development/events/mccormick-tech-expo.html"
     },
     {
       "college": "Northwestern University",
@@ -425,13 +420,6 @@
       "date": "2026-10-09",
       "location": "Pleasantville Campus",
       "source": "https://careerservices.pace.edu/"
-    },
-    {
-      "college": "Pennsylvania State University",
-      "name": "Behrend Career and Internship Fair",
-      "date": "2026-09-24",
-      "location": "Erie Hall, Penn State Behrend",
-      "source": "https://behrend.psu.edu/academics/academic-services/career-services/events/career-fairs"
     },
     {
       "college": "Pennsylvania State University",
@@ -467,15 +455,6 @@
       "date": "2027-03-10",
       "location": "",
       "source": "https://www.purchase.edu/offices/career-development/for-employers/job-and-internship-fair/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Purdue University",
-      "name": "We would like to formally invite you to our Computing Career Fair! This upcoming",
-      "date": "2026-10-07",
-      "location": "",
-      "source": "https://www.cco.purdue.edu/employers/careerfairs?tab=FallCareerFairs",
       "auto": true,
       "scraped_at": "2026-07-10"
     },
@@ -725,22 +704,6 @@
     },
     {
       "college": "University of California, Irvine",
-      "name": "Fall Career & Internship Fair (featuring EngiTECH)",
-      "date": "2026-10-09",
-      "location": "UCI Student Center",
-      "source": "https://career.uci.edu/undergraduate/find-a-job/career-fairs/"
-    },
-    {
-      "college": "University of California, Irvine",
-      "name": "STEM Career & Internship Fair",
-      "date": "2026-10-15",
-      "location": "",
-      "source": "https://career.uci.edu/undergraduate/find-a-job/career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "University of California, Irvine",
       "name": "Fall STEM Career Fair",
       "date": "2026-10-16",
       "location": "UCI Student Center",
@@ -791,13 +754,6 @@
       "date": "2026-10-14",
       "location": "",
       "source": "https://career.ucsb.edu/recruiters/recruitment-calendar"
-    },
-    {
-      "college": "University of California, Santa Cruz",
-      "name": "Fall STEM Career & Internship Fair",
-      "date": "2026-10-14",
-      "location": "UC Santa Cruz main campus",
-      "source": "https://careers.ucsc.edu/employer/events/careerfairs/index.html"
     },
     {
       "college": "University of California, Santa Cruz",
@@ -854,28 +810,19 @@
     },
     {
       "college": "University of Colorado Boulder",
-      "name": "Prepare for the Career Fairs",
-      "date": "2026-10-05",
-      "location": "Center for Community",
-      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
-      "auto": true,
-      "scraped_at": "2026-10-05"
-    },
-    {
-      "college": "University of Colorado Boulder",
-      "name": "Technology, Innovation and Information Career & Internship Fair",
-      "date": "2026-10-13",
-      "location": "University Memorial Center (UMC)",
-      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
-      "auto": true,
-      "scraped_at": "2026-10-12"
-    },
-    {
-      "college": "University of Colorado Boulder",
       "name": "Fall Career & Internship Fair (All Industries)",
       "date": "2026-10-17",
       "location": "University Memorial Center (UMC)",
       "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair"
+    },
+    {
+      "college": "University of Colorado Boulder",
+      "name": "Physics and Quantum Career and Internship Fair",
+      "date": "2026-10-20",
+      "location": "University Memorial Center (UMC)",
+      "source": "https://calendar.colorado.edu/event/fall_all-campus_career_fair",
+      "auto": true,
+      "scraped_at": "2026-10-19"
     },
     {
       "college": "University of Colorado Boulder",
@@ -892,15 +839,6 @@
       "date": "2026-10-07",
       "location": "Rich Concourse, UConn Stamford",
       "source": "https://career.uconn.edu/events/2026/10/07/uconn-stamford-fall-2026-career-fair/"
-    },
-    {
-      "college": "University of Delaware",
-      "name": "The Wealth Management Networking Meetup is a dynamic career fair event for emplo",
-      "date": "2026-10-09",
-      "location": "",
-      "source": "https://www.udel.edu/students/career/career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-07-13"
     },
     {
       "college": "University of Delaware",
@@ -962,6 +900,15 @@
       "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair",
       "auto": true,
       "scraped_at": "2026-07-10"
+    },
+    {
+      "college": "University of Illinois Urbana-Champaign",
+      "name": "Career Fair In-Person: February 3, 2027 Virtual: TBD",
+      "date": "2027-02-03",
+      "location": "",
+      "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair",
+      "auto": true,
+      "scraped_at": "2026-10-19"
     },
     {
       "college": "University of Illinois Urbana-Champaign",
@@ -1093,13 +1040,6 @@
       "date": "2026-09-23",
       "location": "Virtual (Handshake)",
       "source": "https://careerservices.upenn.edu/2026-employer-facing-virtual-fall-career-fair/"
-    },
-    {
-      "college": "University of Pittsburgh",
-      "name": "Swanson School of Engineering Co-op & Internship Job Fair",
-      "date": "2026-10-02",
-      "location": "The University Club, Pittsburgh, PA",
-      "source": "https://www.engineering.pitt.edu/student/programs/coop/job-fair/co-op--internship-job-fair/"
     },
     {
       "college": "University of Pittsburgh",
