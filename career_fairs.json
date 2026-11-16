@@ -1,6 +1,6 @@
 {
   "note": "Upcoming source-verified career-fair dates keyed by official college name (matches the directory's school list). Single source of truth for the directory, which recomputes each school's next fair against today's date on load and drops fairs once they pass. A scheduled scraper (scripts/scrape_fairs.py) merges newly-posted future fairs additively; auto rows are tagged \"auto\": true.",
-  "last_scraped": "2026-11-09",
+  "last_scraped": "2026-11-16",
   "fairs": [
     {
       "college": "Adelphi University",
@@ -91,15 +91,6 @@
     {
       "college": "California Institute of Technology",
       "name": "career fair, or host an info session.",
-      "date": "2026-11-05",
-      "location": "",
-      "source": "https://career.caltech.edu/events",
-      "auto": true,
-      "scraped_at": "2026-07-20"
-    },
-    {
-      "college": "California Institute of Technology",
-      "name": "career fair, or host an info session.",
       "date": "2026-11-09",
       "location": "",
       "source": "https://career.caltech.edu/events",
@@ -183,6 +174,42 @@
       "scraped_at": "2026-07-10"
     },
     {
+      "college": "Florida State University",
+      "name": "The last day to cancel any part of your registration (full or add-ons) for the S",
+      "date": "2027-01-08",
+      "location": "",
+      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
+      "college": "Florida State University",
+      "name": "career fairs. NEW this year: This is a hybrid event with both in-perso",
+      "date": "2027-01-28",
+      "location": "",
+      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
+      "college": "Florida State University",
+      "name": "Career Fair prep and a networking experience designed to help you make",
+      "date": "2027-02-01",
+      "location": "",
+      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
+      "college": "Florida State University",
+      "name": "Final Spring Career Fair",
+      "date": "2027-04-14",
+      "location": "",
+      "source": "https://career.fsu.edu/employers/attend-a-career-fair",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
       "college": "Georgetown University",
       "name": "Annual Fall Career Fair",
       "date": "2026-09-03",
@@ -218,19 +245,30 @@
     },
     {
       "college": "Georgia Institute of Technology",
+      "name": "Career Fair Date(s): January 27, 2027 Time: 9:00 AM – 3:00 PM Location",
+      "date": "2027-01-27",
+      "location": "",
+      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
+      "college": "Georgia Institute of Technology",
+      "name": "Career Fair Date(s): January 29, 2027 Time: 9:00 AM – 3:00 PM Location",
+      "date": "2027-01-29",
+      "location": "",
+      "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
+      "college": "Georgia Institute of Technology",
       "name": "GT Computing Career Fair",
       "date": "2027-02-09",
       "location": "",
       "source": "https://careerfair.gatech.edu/upcoming-career-fairs/",
       "auto": true,
       "scraped_at": "2026-11-02"
-    },
-    {
-      "college": "Harvard University",
-      "name": "Technology, Science, & Data Fair",
-      "date": "2026-10-02",
-      "location": "Harvard Student Organization Center at Hilles (SOCH), 59 Shepard St., Cambridge, MA 02138",
-      "source": "https://careerservices.fas.harvard.edu/resources/data-analytics-science-technology-fair/"
     },
     {
       "college": "Harvard University",
@@ -289,33 +327,6 @@
       "date": "2026-09-25",
       "location": "Johnson Athletic Center",
       "source": "https://capd.mit.edu/channels/fall-career-fair/"
-    },
-    {
-      "college": "Michigan State University",
-      "name": "Career Fair 2026 Wednesday, November 4, 2026 3pm - 6pm Wed, Nov 4 from",
-      "date": "2026-11-04",
-      "location": "",
-      "source": "https://careernetwork.msu.edu/events/category/career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-10-12"
-    },
-    {
-      "college": "Michigan State University",
-      "name": "Career Fair Monday, November 9, 2026 4pm - 6pm Mon, Nov 9 from 4pm - 6",
-      "date": "2026-11-09",
-      "location": "",
-      "source": "https://careernetwork.msu.edu/events/category/career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-10-12"
-    },
-    {
-      "college": "Michigan State University",
-      "name": "Career Fair Wednesday, November 11, 2026 4pm - 6pm Wed, Nov 11 from 4p",
-      "date": "2026-11-11",
-      "location": "",
-      "source": "https://careernetwork.msu.edu/events/category/career-fairs/",
-      "auto": true,
-      "scraped_at": "2026-10-12"
     },
     {
       "college": "Michigan State University",
@@ -921,6 +932,15 @@
     },
     {
       "college": "University of Illinois Urbana-Champaign",
+      "name": "Career Fair registrant is responsible for sharing all event updates an",
+      "date": "2027-01-22",
+      "location": "",
+      "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
+      "college": "University of Illinois Urbana-Champaign",
       "name": "Career Fair In-Person: February 3, 2027 Virtual: TBD",
       "date": "2027-02-03",
       "location": "",
@@ -955,8 +975,8 @@
     },
     {
       "college": "University of Kentucky",
-      "name": "Career Fair Gatton Student Center Contact: Brooke Nowicki",
-      "date": "2026-10-07",
+      "name": "Career Fair Gatton Student Center, Ballroom A Contact: Arts Administra",
+      "date": "2026-11-11",
       "location": "",
       "source": "https://studentsuccess.uky.edu/stuckert-career-center/uk-recruiting-calendar",
       "auto": true,
@@ -964,12 +984,12 @@
     },
     {
       "college": "University of Kentucky",
-      "name": "Career Fair Gatton Student Center, Ballroom A Contact: Arts Administra",
-      "date": "2026-11-11",
+      "name": "Career Fair Gatton Student Center Grand Ballroom Contact: Christina Wi",
+      "date": "2027-02-19",
       "location": "",
       "source": "https://studentsuccess.uky.edu/stuckert-career-center/uk-recruiting-calendar",
       "auto": true,
-      "scraped_at": "2026-07-13"
+      "scraped_at": "2026-11-16"
     },
     {
       "college": "University of Kentucky",
@@ -1163,6 +1183,15 @@
       "source": "https://cockrell.utexas.edu/student-life/career-services/career-fairs/"
     },
     {
+      "college": "University of Texas at Austin",
+      "name": "Spring Engineering Expo Date",
+      "date": "2027-01-28",
+      "location": "",
+      "source": "https://cockrell.utexas.edu/student-life/career-services/career-fairs/",
+      "auto": true,
+      "scraped_at": "2026-11-16"
+    },
+    {
       "college": "University of Texas at Dallas",
       "name": "Fall 2026 All Majors Job & Internship Fair",
       "date": "2026-09-09",
@@ -1310,13 +1339,6 @@
       "source": "https://cdc.wpi.edu/events/2026/09/16/wpi-fall-2026-2-day-career-fair/",
       "auto": true,
       "scraped_at": "2026-07-10"
-    },
-    {
-      "college": "Yale University",
-      "name": "Early Career Networking Fair",
-      "date": "2026-09-09",
-      "location": "New Haven, CT (Yale campus area)",
-      "source": "https://ocs.yale.edu/channels/career-fairs-networking-events/"
     },
     {
       "college": "Yale University",
